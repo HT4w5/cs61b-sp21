@@ -124,13 +124,54 @@ public class Model extends Observable {
         boolean changed;
         changed = false;
 
+        // Implement north first
+        if (side == Side.NORTH) {
+            for (int i = 0; i < size(); ++i) {
+                int sizeAvail = size(); // Limit the available slots to prevent merging newly merged tiles
+                for (int j = size() - 1; j >= 0; --j) {
+                    Tile t = tile(i, j);
+                    // Skip if no tile present
+                    if (t == null) {
+                        continue;
+                    }
+
+                    boolean move = false;
+                    int dstPos = j + 1;
+
+                    for (; dstPos < sizeAvail; ++dstPos) {
+                        Tile ct = tile(i, dstPos);
+                        if (ct == null) {
+                            move = true;
+                            continue;
+                        }
+                        if (ct.value() == t.value()) {
+                            // Merge
+                            board.move(i, dstPos, t);
+                            changed = true;
+                            score += ct.value() + ct.value();
+                            move = false;
+                            sizeAvail = dstPos;
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if (move) {
+                        board.move(i, dstPos - 1, t);
+                        changed = true;
+                    }
+                }
+            }
+        }
+
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
     }
-    
+
     /**
      * Checks if the game is over and sets the gameOver variable
      * appropriately.
