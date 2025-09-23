@@ -2,6 +2,8 @@ package deque;
 
 import org.junit.Test;
 
+import java.util.NoSuchElementException;
+
 import static org.junit.Assert.*;
 
 
@@ -148,6 +150,22 @@ public class LinkedListDequeTest {
         }
 
         assertArrayEquals("Should have the same values", expected, result);
+    }
+
+    @Test
+    /* Test whether next() throws exception when hasNext() is false */
+    public void iteratorExceptionTest() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
+        var it = lld1.iterator();
+        assertFalse("Empty deque's iterator has no next", it.hasNext());
+        boolean thrown = false;
+        try {
+            it.next();
+        } catch (NoSuchElementException e) {
+            thrown = true;
+        }
+
+        assertTrue("next() should throw NoSuchElementException when hasNext() is false", thrown);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package deque;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Implementation of the deque interface with linked lists
@@ -58,6 +59,9 @@ public class LinkedListDeque<T> implements Deque<T> {
 
         @Override
         public T next() {
+            if(!hasNext()) {
+                throw new NoSuchElementException();
+            }
             nodeRef_ = nodeRef_.next_;
             return nodeRef_.value_;
         }
