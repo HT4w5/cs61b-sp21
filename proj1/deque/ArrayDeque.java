@@ -48,7 +48,7 @@ public class ArrayDeque<T> implements Deque<T> {
     private int frontOffset_;
     private int backOffset_;
 
-    T[] array_;
+    private T[] array_;
 
     // Constructor
     public ArrayDeque() {

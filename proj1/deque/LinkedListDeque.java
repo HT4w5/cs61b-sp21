@@ -5,7 +5,6 @@ import java.util.NoSuchElementException;
 
 /**
  * Implementation of the deque interface with linked lists
- *
  * @param <T> contained value type
  */
 public class LinkedListDeque<T> implements Deque<T> {
@@ -79,7 +78,7 @@ public class LinkedListDeque<T> implements Deque<T> {
 
     // Member variables
     private final LLNode<T> sentinel_;
-    int size_;
+    private int size_;
 
     // Public methods
     @Override
