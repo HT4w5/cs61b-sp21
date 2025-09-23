@@ -112,6 +112,29 @@ public class ArrayDeque<T> {
         return array_[frontOffset_ + index];
     }
 
+    public void printDeque() {
+        if (frontOffset_ < backOffset_ || backOffset_ == 0) {
+            for (int i = 0; i < logicalSize_; ++i) {
+                System.out.print(array_[frontOffset_ + i]);
+                if (i != logicalSize_ - 1) {
+                    System.out.print(' ');
+                }
+            }
+        } else {
+            for (int i = frontOffset_; i < allocatedSize_; ++i) {
+                System.out.print(array_[i]);
+                System.out.print(' ');
+            }
+            for (int i = 0; i < backOffset_; ++i) {
+                System.out.print(array_[i]);
+                if (i != logicalSize_ - 1) {
+                    System.out.print(' ');
+                }
+            }
+        }
+        System.out.print('\n');
+    }
+
 
     // Private methods
 
