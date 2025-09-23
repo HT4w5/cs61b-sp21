@@ -1,11 +1,45 @@
 package deque;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 /**
  * Implementation of the deque interface with arrays
  *
  * @param <T> contained value type
  */
-public class ArrayDeque<T> {
+public class ArrayDeque<T> implements Deque<T> {
+    /**
+     * Iterator class for ArrayDeque
+     */
+    private class ArrayDequeIterator implements Iterator<T> {
+        int idx_;
+
+        public ArrayDequeIterator() {
+            idx_ = frontOffset_;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return idx_ != backOffset_;
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            var result = array_[idx_++];
+            if (idx_ == allocatedSize_) {
+                idx_ = 0;
+            }
+
+            return result;
+        }
+
+    }
+
+
     // Member variables
     private final static int INIT_SIZE_ = 8;
 
@@ -27,14 +61,12 @@ public class ArrayDeque<T> {
 
 
     // Public methods
+    @Override
     public int size() {
         return logicalSize_;
     }
 
-    public boolean isEmpty() {
-        return logicalSize_ == 0;
-    }
-
+    @Override
     public void addFirst(T item) {
         if (logicalSize_ == allocatedSize_) {
             upscale();
@@ -50,6 +82,7 @@ public class ArrayDeque<T> {
         ++logicalSize_;
     }
 
+    @Override
     public void addLast(T item) {
         if (logicalSize_ == allocatedSize_) {
             upscale();
@@ -63,6 +96,7 @@ public class ArrayDeque<T> {
         ++logicalSize_;
     }
 
+    @Override
     public T removeFirst() {
         if (logicalSize_ == 0) {
             return null;
@@ -75,7 +109,7 @@ public class ArrayDeque<T> {
         }
 
         --logicalSize_;
-        if(needsDownscale()) {
+        if (needsDownscale()) {
             downscale();
         }
 
@@ -83,6 +117,7 @@ public class ArrayDeque<T> {
         return result;
     }
 
+    @Override
     public T removeLast() {
         if (logicalSize_ == 0) {
             return null;
@@ -97,13 +132,14 @@ public class ArrayDeque<T> {
         array_[backOffset_] = null;
         --logicalSize_;
 
-        if(needsDownscale()) {
+        if (needsDownscale()) {
             downscale();
         }
 
         return result;
     }
 
+    @Override
     public T get(int index) {
         if (index >= allocatedSize_) {
             return null;
@@ -122,6 +158,7 @@ public class ArrayDeque<T> {
         return array_[frontOffset_ + index];
     }
 
+    @Override
     public void printDeque() {
         if (frontOffset_ < backOffset_ || backOffset_ == 0) {
             for (int i = 0; i < logicalSize_; ++i) {
@@ -143,6 +180,42 @@ public class ArrayDeque<T> {
             }
         }
         System.out.print('\n');
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayDequeIterator();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (this == o) {
+            return true;
+        }
+        if (this.getClass() != o.getClass()) {
+            return false;
+        }
+
+        // Deep equality
+        var other = (ArrayDeque<T>) o;
+
+        var it1 = iterator();
+        var it2 = other.iterator();
+
+        while (true) {
+            if (it1.hasNext() ^ it2.hasNext()) {
+                return false;
+            }
+            if (!it1.hasNext()) {
+                return true;
+            }
+            if (it1.next() != it2.next()) {
+                return false;
+            }
+        }
     }
 
 

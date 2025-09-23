@@ -2,6 +2,8 @@ package deque;
 
 import org.junit.Test;
 
+import java.util.NoSuchElementException;
+
 import static org.junit.Assert.*;
 
 
@@ -214,5 +216,86 @@ public class ArrayDequeTest {
                 assertEquals("Should have the same value", i + 1000, ad1.removeLast().intValue());
             }
         }
+    }
+
+    @Test
+    /* Test iterator for ArrayDeque */
+    public void iteratorTest() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<Integer>();
+        for (int i = 0; i < 10; i++) {
+            lld1.addLast(i);
+        }
+
+        var expected = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        var result = new int[10];
+
+        var it = lld1.iterator();
+        int idx = 0;
+        while (it.hasNext()) {
+            result[idx] = it.next();
+            ++idx;
+        }
+
+        assertArrayEquals("Should have the same values", expected, result);
+    }
+
+    @Test
+    /* Test whether next() throws exception when hasNext() is false */
+    public void iteratorExceptionTest() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<Integer>();
+        var it = lld1.iterator();
+        assertFalse("Empty deque's iterator has no next", it.hasNext());
+        boolean thrown = false;
+        try {
+            it.next();
+        } catch (NoSuchElementException e) {
+            thrown = true;
+        }
+
+        assertTrue("next() should throw NoSuchElementException when hasNext() is false", thrown);
+    }
+
+    @Test
+    /* Test equals() */
+    public void equalsTest1() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+        ArrayDeque<Integer> lld2 = new ArrayDeque<>();
+
+        assertFalse("Return false if other is null", lld1.equals(null));
+        assertTrue("Return true for the same object", lld1.equals(lld1));
+        assertTrue("Return true for two empty llds", lld1.equals(lld2));
+    }
+
+    @Test
+    /* Test equals() */
+    public void equalsTest2() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+        ArrayDeque<Integer> lld2 = new ArrayDeque<>();
+
+        for (int i = 0; i < 10; ++i) {
+            lld1.addFirst(i);
+            lld2.addFirst(i);
+        }
+
+        assertTrue("LLDs with same content are equal", lld1.equals(lld2));
+
+        // Modify
+        lld2.removeFirst();
+        lld2.addFirst(-1);
+        assertFalse("LLDs with different content are not equal", lld1.equals(lld2));
+    }
+
+    @Test
+    /* Test equals() */
+    public void equalsTest3() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+        ArrayDeque<Integer> lld2 = new ArrayDeque<>();
+
+        for (int i = 0; i < 10; ++i) {
+            lld1.addFirst(i);
+            lld2.addLast(i);
+        }
+
+        assertFalse("LLDs with different content are not equal", lld1.equals(lld2));
     }
 }
