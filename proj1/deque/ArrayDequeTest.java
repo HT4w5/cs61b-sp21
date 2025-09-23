@@ -130,4 +130,89 @@ public class ArrayDequeTest {
 
 
     }
+
+    @Test
+    /* Add more than 8 elements to deque; check if upscale is being performed */
+    public void upscaleTest() {
+        ArrayDeque<Integer> ad1 = new ArrayDeque<>();
+        for (int i = 0; i <= 2000; i++) {
+            ad1.addLast(i);
+            ad1.addFirst(-i);
+        }
+
+        for (int i = 2000; i >= 0; --i) {
+            assertEquals("Should have the same value", -i, ad1.removeFirst().intValue());
+            assertEquals("Should have the same value", i, ad1.removeLast().intValue());
+        }
+    }
+
+    @Test
+    /* Add and remove, then verify to check downscale */
+    public void downscaleTest1() {
+        ArrayDeque<Integer> ad1 = new ArrayDeque<>();
+        for (int i = 0; i <= 20; ++i) {
+            ad1.addFirst(i);
+        }
+
+        for (int i = 0; i < 10000; ++i) {
+            ad1.addLast(-1);
+            ad1.addFirst(-1);
+        }
+
+        for (int i = 0; i < 10000; ++i) {
+            ad1.removeFirst();
+            ad1.removeLast();
+        }
+
+        // Verify
+        for (int i = 20; i >= 0; --i) {
+            assertEquals("Should have the same value", i, ad1.removeFirst().intValue());
+        }
+    }
+
+    @Test
+    /* Add and remove, then verify to check downscale */
+    public void downscaleTest2() {
+        ArrayDeque<Integer> ad1 = new ArrayDeque<>();
+        for (int i = 0; i <= 10; ++i) {
+            ad1.addFirst(i);
+        }
+
+        for (int i = 0; i < 10000; ++i) {
+            ad1.addLast(-1);
+            ad1.addFirst(-1);
+        }
+
+        for (int i = 0; i < 10000; ++i) {
+            ad1.removeFirst();
+            ad1.removeLast();
+        }
+
+        // Verify
+        for (int i = 10; i >= 0; --i) {
+            assertEquals("Should have the same value", i, ad1.removeFirst().intValue());
+        }
+    }
+
+
+    @Test
+    /* Test ring buffer wrap around */
+    public void ringTest() {
+        for (int bufferSize = 0; bufferSize <= 256; ++bufferSize) {
+            ArrayDeque<Integer> ad1 = new ArrayDeque<>();
+
+            for (int i = 0; i < bufferSize; ++i) {
+                ad1.addFirst(i);
+            }
+
+            for (int i = 0; i < 1000; ++i) {
+                ad1.addFirst(bufferSize + i);
+                assertEquals("Should have the same value", i, ad1.removeLast().intValue());
+            }
+
+            for (int i = 0; i < bufferSize; ++i) {
+                assertEquals("Should have the same value", i + 1000, ad1.removeLast().intValue());
+            }
+        }
+    }
 }

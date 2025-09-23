@@ -75,6 +75,11 @@ public class ArrayDeque<T> {
         }
 
         --logicalSize_;
+        if(needsDownscale()) {
+            downscale();
+        }
+
+
         return result;
     }
 
@@ -91,6 +96,11 @@ public class ArrayDeque<T> {
         var result = array_[backOffset_];
         array_[backOffset_] = null;
         --logicalSize_;
+
+        if(needsDownscale()) {
+            downscale();
+        }
+
         return result;
     }
 
@@ -163,5 +173,42 @@ public class ArrayDeque<T> {
         array_ = newArray;
         allocatedSize_ = newSize;
     }
+
+    /**
+     * Shrink the underlying array by half
+     */
+    private void downscale() {
+        int newSize = allocatedSize_ / 2;
+        var newArray = (T[]) new Object[newSize];
+        if (logicalSize_ == 0) {
+            array_ = newArray;
+            frontOffset_ = newSize / 2;
+            backOffset_ = newSize / 2;
+            allocatedSize_ = newSize;
+            return;
+        }
+        // Copy data to new array and set new offsets
+        if (frontOffset_ < backOffset_) {
+            System.arraycopy(array_, frontOffset_, newArray, 0, logicalSize_);
+            frontOffset_ = 0;
+            backOffset_ = logicalSize_;
+        } else {
+            System.arraycopy(array_, 0, newArray, 0, backOffset_);
+            int newFrontOffset = frontOffset_ + (newSize - allocatedSize_);
+            System.arraycopy(array_, frontOffset_, newArray, newFrontOffset, allocatedSize_ - frontOffset_);
+            frontOffset_ = newFrontOffset;
+        }
+        array_ = newArray;
+        allocatedSize_ = newSize;
+    }
+
+    private boolean needsDownscale() {
+        if (allocatedSize_ < 16) {
+            return false;
+        }
+        // Downscale
+        return allocatedSize_ > logicalSize_ * 4;
+    }
+
 
 }
