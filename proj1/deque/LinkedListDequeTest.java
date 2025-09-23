@@ -127,7 +127,70 @@ public class LinkedListDequeTest {
         for (double i = 999999; i > 500000; i--) {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
+    }
 
+    @Test
+    /* Test iterator for LinkedListDeque */
+    public void iteratorTest() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
+        for (int i = 0; i < 10; i++) {
+            lld1.addLast(i);
+        }
 
+        var expected = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        var result = new int[10];
+
+        var it = lld1.iterator();
+        int idx = 0;
+        while (it.hasNext()) {
+            result[idx] = it.next();
+            ++idx;
+        }
+
+        assertArrayEquals("Should have the same values", expected, result);
+    }
+
+    @Test
+    /* Test equals() */
+    public void equalsTest1() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+
+        assertFalse("Return false if other is null", lld1.equals(null));
+        assertTrue("Return true for the same object", lld1.equals(lld1));
+        assertTrue("Return true for two empty llds", lld1.equals(lld2));
+    }
+
+    @Test
+    /* Test equals() */
+    public void equalsTest2() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+
+        for(int i=0;i<10;++i) {
+            lld1.addFirst(i);
+            lld2.addFirst(i);
+        }
+
+        assertTrue("LLDs with same content are equal", lld1.equals(lld2));
+
+        // Modify
+        lld2.removeFirst();
+        lld2.addFirst(-1);
+        assertFalse("LLDs with different content are not equal", lld1.equals(lld2));
+    }
+
+    @Test
+    /* Test equals() */
+    public void equalsTest3() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+
+        for(int i=0;i<10;++i) {
+            lld1.addFirst(i);
+            lld2.addLast(i);
+        }
+
+        assertFalse("LLDs with different content are not equal", lld1.equals(lld2));
     }
 }

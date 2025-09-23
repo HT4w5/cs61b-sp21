@@ -1,10 +1,13 @@
 package deque;
 
+import java.util.Iterator;
+
 /**
  * Implementation of the deque interface with linked lists
+ *
  * @param <T> contained value type
  */
-public class LinkedListDeque<T> {
+public class LinkedListDeque<T> implements Deque<T> {
     /**
      * Node class for the LinkedListDeque
      *
@@ -38,6 +41,28 @@ public class LinkedListDeque<T> {
 
     }
 
+    /**
+     * Iterator class for LinkedListDeque
+     */
+    private class LinkedListDequeIterator implements Iterator<T> {
+        LLNode<T> nodeRef_;
+
+        public LinkedListDequeIterator() {
+            nodeRef_ = sentinel_;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return nodeRef_.next_ != sentinel_;
+        }
+
+        @Override
+        public T next() {
+            nodeRef_ = nodeRef_.next_;
+            return nodeRef_.value_;
+        }
+    }
+
     // Constructor
 
     /**
@@ -53,15 +78,12 @@ public class LinkedListDeque<T> {
     int size_;
 
     // Public methods
-
+    @Override
     public int size() {
         return size_;
     }
 
-    public boolean isEmpty() {
-        return size_ == 0;
-    }
-
+    @Override
     public void addFirst(T item) {
         var newNode = new LLNode<>(item, sentinel_, sentinel_.next_);
         // Modify reference for both sentinel_ and sentinel_.next_
@@ -70,6 +92,7 @@ public class LinkedListDeque<T> {
         ++size_;
     }
 
+    @Override
     public void addLast(T item) {
         var newNode = new LLNode<>(item, sentinel_.prev_, sentinel_);
         // Modify reference for both sentinel_ and sentinel_.prev_
@@ -78,6 +101,7 @@ public class LinkedListDeque<T> {
         ++size_;
     }
 
+    @Override
     public T removeFirst() {
         if (size_ == 0) {
             return null;
@@ -93,6 +117,7 @@ public class LinkedListDeque<T> {
         return result.value_;
     }
 
+    @Override
     public T removeLast() {
         if (size_ == 0) {
             return null;
@@ -108,6 +133,7 @@ public class LinkedListDeque<T> {
         return result.value_;
     }
 
+    @Override
     public T get(int index) {
         if (index >= size_) {
             return null;
@@ -144,6 +170,7 @@ public class LinkedListDeque<T> {
         }
     }
 
+    @Override
     public void printDeque() {
         var temp = sentinel_;
         while (temp.next_ != sentinel_) {
@@ -154,6 +181,42 @@ public class LinkedListDeque<T> {
             temp = temp.next_;
         }
         System.out.print('\n');
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new LinkedListDequeIterator();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (this == o) {
+            return true;
+        }
+        if (this.getClass() != o.getClass()) {
+            return false;
+        }
+
+        // Deep equality
+        var other = (LinkedListDeque<T>) o;
+
+        var it1 = iterator();
+        var it2 = other.iterator();
+
+        while (true) {
+            if (it1.hasNext() ^ it2.hasNext()) {
+                return false;
+            }
+            if (!it1.hasNext()) {
+                return true;
+            }
+            if (it1.next() != it2.next()) {
+                return false;
+            }
+        }
     }
 
     // Private methods
