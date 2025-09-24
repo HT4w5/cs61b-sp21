@@ -106,8 +106,10 @@ public class LinkedListDequeTest {
 
         boolean passed1 = false;
         boolean passed2 = false;
-        assertEquals("Should return null when removeFirst is called on an empty Deque,", null, lld1.removeFirst());
-        assertEquals("Should return null when removeLast is called on an empty Deque,", null, lld1.removeLast());
+        assertEquals("Should return null when removeFirst is called on an empty Deque,", null,
+                lld1.removeFirst());
+        assertEquals("Should return null when removeLast is called on an empty Deque,", null,
+                lld1.removeLast());
 
 
     }
@@ -185,7 +187,7 @@ public class LinkedListDequeTest {
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
         LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
 
-        for(int i=0;i<10;++i) {
+        for (int i = 0; i < 10; ++i) {
             lld1.addFirst(i);
             lld2.addFirst(i);
         }
@@ -204,7 +206,7 @@ public class LinkedListDequeTest {
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
         LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
 
-        for(int i=0;i<10;++i) {
+        for (int i = 0; i < 10; ++i) {
             lld1.addFirst(i);
             lld2.addLast(i);
         }
