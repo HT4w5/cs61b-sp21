@@ -187,7 +187,6 @@ public class LinkedListDeque<T> implements Deque<T> {
         System.out.print('\n');
     }
 
-    @Override
     public Iterator<T> iterator() {
         return new LinkedListDequeIterator();
     }
@@ -200,27 +199,27 @@ public class LinkedListDeque<T> implements Deque<T> {
         if (this == o) {
             return true;
         }
-        if (this.getClass() != o.getClass()) {
+        if (!(o instanceof Deque)) {
             return false;
         }
 
         // Deep equality
-        var other = (LinkedListDeque<T>) o;
+        var other = (Deque<T>) o;
+
+        if (size() != other.size()) {
+            return false;
+        }
 
         var it1 = iterator();
         var it2 = other.iterator();
 
-        while (true) {
-            if (it1.hasNext() ^ it2.hasNext()) {
-                return false;
-            }
-            if (!it1.hasNext()) {
-                return true;
-            }
-            if (it1.next() != it2.next()) {
+        while (it1.hasNext()) {
+            if (!it1.next().equals(it2.next())) {
                 return false;
             }
         }
+
+        return true;
     }
 
     // Private methods
