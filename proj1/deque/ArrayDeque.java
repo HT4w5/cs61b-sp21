@@ -13,17 +13,17 @@ public class ArrayDeque<T> implements Deque<T> {
      * Iterator class for ArrayDeque
      */
     private class ArrayDequeIterator implements Iterator<T> {
-        int idx_;
-        int offset_;
+        int idx;
+        int offset;
 
-        public ArrayDequeIterator() {
-            idx_ = 0;
-            offset_ = 0;
+        ArrayDequeIterator() {
+            idx = 0;
+            offset = 0;
         }
 
         @Override
         public boolean hasNext() {
-            return idx_ != logicalSize_;
+            return idx != logicalSize;
         }
 
         @Override
@@ -31,9 +31,9 @@ public class ArrayDeque<T> implements Deque<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            var result = array_[frontOffset_ + (idx_++) - offset_];
-            if (idx_ + frontOffset_ == allocatedSize_) {
-                offset_ = allocatedSize_;
+            var result = array[frontOffset + (idx++) - offset];
+            if (idx + frontOffset == allocatedSize) {
+                offset = allocatedSize;
             }
 
             return result;
@@ -43,74 +43,74 @@ public class ArrayDeque<T> implements Deque<T> {
 
 
     // Member variables
-    private final static int INIT_SIZE_ = 8;
+    private static final int INIT_SIZE = 8;
 
-    private int logicalSize_;
-    private int allocatedSize_;
-    private int frontOffset_;
-    private int backOffset_;
+    private int logicalSize;
+    private int allocatedSize;
+    private int frontOffset;
+    private int backOffset;
 
-    private T[] array_;
+    private T[] array;
 
     // Constructor
     public ArrayDeque() {
-        logicalSize_ = 0;
-        allocatedSize_ = INIT_SIZE_;
-        array_ = (T[]) new Object[INIT_SIZE_];
-        frontOffset_ = INIT_SIZE_ / 2;
-        backOffset_ = INIT_SIZE_ / 2;
+        logicalSize = 0;
+        allocatedSize = INIT_SIZE;
+        array = (T[]) new Object[INIT_SIZE];
+        frontOffset = INIT_SIZE / 2;
+        backOffset = INIT_SIZE / 2;
     }
 
 
     // Public methods
     @Override
     public int size() {
-        return logicalSize_;
+        return logicalSize;
     }
 
     @Override
     public void addFirst(T item) {
-        if (logicalSize_ == allocatedSize_) {
+        if (logicalSize == allocatedSize) {
             upscale();
         }
 
-        if (frontOffset_ == 0) {
-            frontOffset_ = allocatedSize_;
+        if (frontOffset == 0) {
+            frontOffset = allocatedSize;
         }
-        --frontOffset_;
+        --frontOffset;
 
 
-        array_[frontOffset_] = item;
-        ++logicalSize_;
+        array[frontOffset] = item;
+        ++logicalSize;
     }
 
     @Override
     public void addLast(T item) {
-        if (logicalSize_ == allocatedSize_) {
+        if (logicalSize == allocatedSize) {
             upscale();
         }
 
-        array_[backOffset_++] = item;
-        if (backOffset_ == allocatedSize_) {
-            backOffset_ = 0;
+        array[backOffset++] = item;
+        if (backOffset == allocatedSize) {
+            backOffset = 0;
         }
 
-        ++logicalSize_;
+        ++logicalSize;
     }
 
     @Override
     public T removeFirst() {
-        if (logicalSize_ == 0) {
+        if (logicalSize == 0) {
             return null;
         }
 
-        var result = array_[frontOffset_];
-        array_[frontOffset_++] = null;
-        if (frontOffset_ == allocatedSize_) {
-            frontOffset_ = 0;
+        var result = array[frontOffset];
+        array[frontOffset++] = null;
+        if (frontOffset == allocatedSize) {
+            frontOffset = 0;
         }
 
-        --logicalSize_;
+        --logicalSize;
         if (needsDownscale()) {
             downscale();
         }
@@ -121,18 +121,18 @@ public class ArrayDeque<T> implements Deque<T> {
 
     @Override
     public T removeLast() {
-        if (logicalSize_ == 0) {
+        if (logicalSize == 0) {
             return null;
         }
 
-        if (backOffset_ == 0) {
-            backOffset_ = allocatedSize_;
+        if (backOffset == 0) {
+            backOffset = allocatedSize;
         }
-        --backOffset_;
+        --backOffset;
 
-        var result = array_[backOffset_];
-        array_[backOffset_] = null;
-        --logicalSize_;
+        var result = array[backOffset];
+        array[backOffset] = null;
+        --logicalSize;
 
         if (needsDownscale()) {
             downscale();
@@ -143,40 +143,40 @@ public class ArrayDeque<T> implements Deque<T> {
 
     @Override
     public T get(int index) {
-        if (index >= allocatedSize_) {
+        if (index >= allocatedSize) {
             return null;
         }
 
-        if (frontOffset_ < backOffset_) {
-            return array_[frontOffset_ + index];
+        if (frontOffset < backOffset) {
+            return array[frontOffset + index];
         }
 
-        int rightSegmentSize = allocatedSize_ - frontOffset_;
+        int rightSegmentSize = allocatedSize - frontOffset;
         if (index >= rightSegmentSize) {
             index -= rightSegmentSize;
-            return array_[index];
+            return array[index];
         }
 
-        return array_[frontOffset_ + index];
+        return array[frontOffset + index];
     }
 
     @Override
     public void printDeque() {
-        if (frontOffset_ < backOffset_ || backOffset_ == 0) {
-            for (int i = 0; i < logicalSize_; ++i) {
-                System.out.print(array_[frontOffset_ + i]);
-                if (i != logicalSize_ - 1) {
+        if (frontOffset < backOffset || backOffset == 0) {
+            for (int i = 0; i < logicalSize; ++i) {
+                System.out.print(array[frontOffset + i]);
+                if (i != logicalSize - 1) {
                     System.out.print(' ');
                 }
             }
         } else {
-            for (int i = frontOffset_; i < allocatedSize_; ++i) {
-                System.out.print(array_[i]);
+            for (int i = frontOffset; i < allocatedSize; ++i) {
+                System.out.print(array[i]);
                 System.out.print(' ');
             }
-            for (int i = 0; i < backOffset_; ++i) {
-                System.out.print(array_[i]);
-                if (i != logicalSize_ - 1) {
+            for (int i = 0; i < backOffset; ++i) {
+                System.out.print(array[i]);
+                if (i != logicalSize - 1) {
                     System.out.print(' ');
                 }
             }
@@ -184,7 +184,6 @@ public class ArrayDeque<T> implements Deque<T> {
         System.out.print('\n');
     }
 
-    @Override
     public Iterator<T> iterator() {
         return new ArrayDequeIterator();
     }
@@ -227,62 +226,64 @@ public class ArrayDeque<T> implements Deque<T> {
      * Enlarge the underlying array exponentially
      */
     private void upscale() {
-        int newSize = allocatedSize_ * 2;
+        int newSize = allocatedSize * 2;
         var newArray = (T[]) new Object[newSize];
-        if (logicalSize_ == 0) {
-            array_ = newArray;
-            frontOffset_ = newSize / 2;
-            backOffset_ = newSize / 2;
-            allocatedSize_ = newSize;
+        if (logicalSize == 0) {
+            array = newArray;
+            frontOffset = newSize / 2;
+            backOffset = newSize / 2;
+            allocatedSize = newSize;
             return;
         }
         // Copy data to new array and set new offsets
-        if (frontOffset_ < backOffset_) {
-            System.arraycopy(array_, frontOffset_, newArray, frontOffset_, logicalSize_);
+        if (frontOffset < backOffset) {
+            System.arraycopy(array, frontOffset, newArray, frontOffset, logicalSize);
         } else {
-            System.arraycopy(array_, 0, newArray, 0, backOffset_);
-            int newFrontOffset = frontOffset_ + (newSize - allocatedSize_);
-            System.arraycopy(array_, frontOffset_, newArray, newFrontOffset, allocatedSize_ - frontOffset_);
-            frontOffset_ = newFrontOffset;
+            System.arraycopy(array, 0, newArray, 0, backOffset);
+            int newFrontOffset = frontOffset + (newSize - allocatedSize);
+            System.arraycopy(array, frontOffset, newArray, newFrontOffset,
+                    allocatedSize - frontOffset);
+            frontOffset = newFrontOffset;
         }
-        array_ = newArray;
-        allocatedSize_ = newSize;
+        array = newArray;
+        allocatedSize = newSize;
     }
 
     /**
      * Shrink the underlying array by half
      */
     private void downscale() {
-        int newSize = allocatedSize_ / 2;
+        int newSize = allocatedSize / 2;
         var newArray = (T[]) new Object[newSize];
-        if (logicalSize_ == 0) {
-            array_ = newArray;
-            frontOffset_ = newSize / 2;
-            backOffset_ = newSize / 2;
-            allocatedSize_ = newSize;
+        if (logicalSize == 0) {
+            array = newArray;
+            frontOffset = newSize / 2;
+            backOffset = newSize / 2;
+            allocatedSize = newSize;
             return;
         }
         // Copy data to new array and set new offsets
-        if (frontOffset_ < backOffset_) {
-            System.arraycopy(array_, frontOffset_, newArray, 0, logicalSize_);
-            frontOffset_ = 0;
-            backOffset_ = logicalSize_;
+        if (frontOffset < backOffset) {
+            System.arraycopy(array, frontOffset, newArray, 0, logicalSize);
+            frontOffset = 0;
+            backOffset = logicalSize;
         } else {
-            System.arraycopy(array_, 0, newArray, 0, backOffset_);
-            int newFrontOffset = frontOffset_ + (newSize - allocatedSize_);
-            System.arraycopy(array_, frontOffset_, newArray, newFrontOffset, allocatedSize_ - frontOffset_);
-            frontOffset_ = newFrontOffset;
+            System.arraycopy(array, 0, newArray, 0, backOffset);
+            int newFrontOffset = frontOffset + (newSize - allocatedSize);
+            System.arraycopy(array, frontOffset, newArray, newFrontOffset,
+                    allocatedSize - frontOffset);
+            frontOffset = newFrontOffset;
         }
-        array_ = newArray;
-        allocatedSize_ = newSize;
+        array = newArray;
+        allocatedSize = newSize;
     }
 
     private boolean needsDownscale() {
-        if (allocatedSize_ < 16) {
+        if (allocatedSize < 16) {
             return false;
         }
         // Downscale
-        return allocatedSize_ > logicalSize_ * 4;
+        return allocatedSize > logicalSize * 4;
     }
 
 

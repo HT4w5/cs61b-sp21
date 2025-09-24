@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 /**
  * Implementation of the deque interface with linked lists
+ *
  * @param <T> contained value type
  */
 public class LinkedListDeque<T> implements Deque<T> {
@@ -14,9 +15,9 @@ public class LinkedListDeque<T> implements Deque<T> {
      * @param <T>
      */
     private static class LLNode<T> {
-        T value_;
-        LLNode<T> prev_;
-        LLNode<T> next_;
+        T value;
+        LLNode<T> prev;
+        LLNode<T> next;
 
         /**
          * Constructor for LLNode
@@ -24,19 +25,19 @@ public class LinkedListDeque<T> implements Deque<T> {
          * @param v value of T contained in node
          * @param n reference to next node
          */
-        public LLNode(T v, LLNode<T> p, LLNode<T> n) {
-            value_ = v;
-            prev_ = p;
-            next_ = n;
+        LLNode(T v, LLNode<T> p, LLNode<T> n) {
+            value = v;
+            prev = p;
+            next = n;
         }
 
         /**
          * Empty constructor for creating a sentinel node
          */
-        public LLNode() {
+        LLNode() {
             // Point to self
-            prev_ = this;
-            next_ = this;
+            prev = this;
+            next = this;
         }
 
     }
@@ -45,24 +46,24 @@ public class LinkedListDeque<T> implements Deque<T> {
      * Iterator class for LinkedListDeque
      */
     private class LinkedListDequeIterator implements Iterator<T> {
-        LLNode<T> nodeRef_;
+        LLNode<T> nodeRef;
 
-        public LinkedListDequeIterator() {
-            nodeRef_ = sentinel_;
+        LinkedListDequeIterator() {
+            nodeRef = sentinel;
         }
 
         @Override
         public boolean hasNext() {
-            return nodeRef_.next_ != sentinel_;
+            return nodeRef.next != sentinel;
         }
 
         @Override
         public T next() {
-            if(!hasNext()) {
+            if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            nodeRef_ = nodeRef_.next_;
-            return nodeRef_.value_;
+            nodeRef = nodeRef.next;
+            return nodeRef.value;
         }
     }
 
@@ -72,116 +73,116 @@ public class LinkedListDeque<T> implements Deque<T> {
      * Creates an empty LinkedListDeque
      */
     public LinkedListDeque() {
-        sentinel_ = new LLNode<>();
-        size_ = 0;
+        sentinel = new LLNode<>();
+        size = 0;
     }
 
     // Member variables
-    private final LLNode<T> sentinel_;
-    private int size_;
+    private final LLNode<T> sentinel;
+    private int size;
 
     // Public methods
     @Override
     public int size() {
-        return size_;
+        return size;
     }
 
     @Override
     public void addFirst(T item) {
-        var newNode = new LLNode<>(item, sentinel_, sentinel_.next_);
-        // Modify reference for both sentinel_ and sentinel_.next_
-        sentinel_.next_.prev_ = newNode;
-        sentinel_.next_ = newNode;
-        ++size_;
+        var newNode = new LLNode<>(item, sentinel, sentinel.next);
+        // Modify reference for both sentinel and sentinel.next
+        sentinel.next.prev = newNode;
+        sentinel.next = newNode;
+        ++size;
     }
 
     @Override
     public void addLast(T item) {
-        var newNode = new LLNode<>(item, sentinel_.prev_, sentinel_);
-        // Modify reference for both sentinel_ and sentinel_.prev_
-        sentinel_.prev_.next_ = newNode;
-        sentinel_.prev_ = newNode;
-        ++size_;
+        var newNode = new LLNode<>(item, sentinel.prev, sentinel);
+        // Modify reference for both sentinel and sentinel.prev
+        sentinel.prev.next = newNode;
+        sentinel.prev = newNode;
+        ++size;
     }
 
     @Override
     public T removeFirst() {
-        if (size_ == 0) {
+        if (size == 0) {
             return null;
         }
 
-        var result = sentinel_.next_;
+        var result = sentinel.next;
 
         // Modify references for adjacent nodes
-        result.next_.prev_ = sentinel_;
-        sentinel_.next_ = result.next_;
-        --size_;
+        result.next.prev = sentinel;
+        sentinel.next = result.next;
+        --size;
 
-        return result.value_;
+        return result.value;
     }
 
     @Override
     public T removeLast() {
-        if (size_ == 0) {
+        if (size == 0) {
             return null;
         }
 
-        var result = sentinel_.prev_;
+        var result = sentinel.prev;
 
         // Modify references for adjacent nodes
-        result.prev_.next_ = sentinel_;
-        sentinel_.prev_ = result.prev_;
-        --size_;
+        result.prev.next = sentinel;
+        sentinel.prev = result.prev;
+        --size;
 
-        return result.value_;
+        return result.value;
     }
 
     @Override
     public T get(int index) {
-        if (index >= size_) {
+        if (index >= size) {
             return null;
         }
 
         // Determine the closest route
-        var revertedIndex = size_ - index - 1;
+        var revertedIndex = size - index - 1;
         LLNode<T> temp;
         if (index <= revertedIndex) {
-            temp = sentinel_.next_;
+            temp = sentinel.next;
             for (int i = 0; i < index; ++i) {
-                temp = temp.next_;
+                temp = temp.next;
             }
         } else {
-            temp = sentinel_.prev_;
+            temp = sentinel.prev;
             for (int i = 0; i < revertedIndex; ++i) {
-                temp = temp.prev_;
+                temp = temp.prev;
             }
         }
-        return temp.value_;
+        return temp.value;
     }
 
     public T getRecursive(int index) {
-        if (index >= size_) {
+        if (index >= size) {
             return null;
         }
 
         // Determine the closest route
-        var revertedIndex = size_ - index - 1;
+        var revertedIndex = size - index - 1;
         if (index <= revertedIndex) {
-            return recursiveGetNext(sentinel_.next_, index);
+            return recursiveGetNext(sentinel.next, index);
         } else {
-            return recursiveGetPrev(sentinel_.prev_, index);
+            return recursiveGetPrev(sentinel.prev, index);
         }
     }
 
     @Override
     public void printDeque() {
-        var temp = sentinel_;
-        while (temp.next_ != sentinel_) {
-            System.out.print(temp.value_);
-            if (temp.next_.next_ != sentinel_) {
+        var temp = sentinel;
+        while (temp.next != sentinel) {
+            System.out.print(temp.value);
+            if (temp.next.next != sentinel) {
                 System.out.print(' ');
             }
-            temp = temp.next_;
+            temp = temp.next;
         }
         System.out.print('\n');
     }
@@ -233,9 +234,9 @@ public class LinkedListDeque<T> implements Deque<T> {
      */
     private T recursiveGetNext(LLNode<T> node, int index) {
         if (index == 0) {
-            return node.value_;
+            return node.value;
         }
-        return recursiveGetNext(node.next_, index - 1);
+        return recursiveGetNext(node.next, index - 1);
     }
 
     /**
@@ -247,9 +248,9 @@ public class LinkedListDeque<T> implements Deque<T> {
      */
     private T recursiveGetPrev(LLNode<T> node, int index) {
         if (index == 0) {
-            return node.value_;
+            return node.value;
         }
-        return recursiveGetNext(node.prev_, index - 1);
+        return recursiveGetNext(node.prev, index - 1);
     }
 
 }
