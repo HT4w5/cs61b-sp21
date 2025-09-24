@@ -240,6 +240,27 @@ public class ArrayDequeTest {
     }
 
     @Test
+    /* Test iterator for ArrayDeque */
+    public void iteratorTest2() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<Integer>();
+        for (int i = 0; i < 8; i++) {
+            lld1.addLast(i);
+        }
+
+        var expected = new int[]{0, 1, 2, 3, 4, 5, 6, 7};
+        var result = new int[8];
+
+        var it = lld1.iterator();
+        int idx = 0;
+        while (it.hasNext()) {
+            result[idx] = it.next();
+            ++idx;
+        }
+
+        assertArrayEquals("Should have the same values", expected, result);
+    }
+
+    @Test
     /* Test whether next() throws exception when hasNext() is false */
     public void iteratorExceptionTest() {
         ArrayDeque<Integer> lld1 = new ArrayDeque<Integer>();

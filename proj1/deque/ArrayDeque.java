@@ -14,14 +14,16 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     private class ArrayDequeIterator implements Iterator<T> {
         int idx_;
+        int offset_;
 
         public ArrayDequeIterator() {
-            idx_ = frontOffset_;
+            idx_ = 0;
+            offset_ = 0;
         }
 
         @Override
         public boolean hasNext() {
-            return idx_ != backOffset_;
+            return idx_ != logicalSize_;
         }
 
         @Override
@@ -29,9 +31,9 @@ public class ArrayDeque<T> implements Deque<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            var result = array_[idx_++];
-            if (idx_ == allocatedSize_) {
-                idx_ = 0;
+            var result = array_[frontOffset_ + (idx_++) - offset_];
+            if (idx_ + frontOffset_ == allocatedSize_) {
+                offset_ = allocatedSize_;
             }
 
             return result;
