@@ -27,8 +27,8 @@ public class DequeTest {
         ArrayDeque<String> ad1 = new ArrayDeque<>();
 
         for (int i = 0; i < 10; ++i) {
-            lld1.addFirst(""+i);
-            ad1.addFirst(""+i);
+            lld1.addFirst("" + i);
+            ad1.addFirst("" + i);
         }
 
         assertEquals("LLD and AD with the same values are considered equal", lld1, ad1);

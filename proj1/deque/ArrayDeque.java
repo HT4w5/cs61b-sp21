@@ -207,11 +207,8 @@ public class ArrayDeque<T> implements Deque<T> {
             return false;
         }
 
-        var it1 = iterator();
-        var it2 = other.iterator();
-
-        while (it1.hasNext()) {
-            if (!it1.next().equals(it2.next())) {
+        for(int i=0;i<size();++i) {
+            if(!get(i).equals(other.get(i))) {
                 return false;
             }
         }
