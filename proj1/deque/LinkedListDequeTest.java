@@ -213,4 +213,20 @@ public class LinkedListDequeTest {
 
         assertFalse("LLDs with different content are not equal", lld1.equals(lld2));
     }
+
+    @Test
+    /* Test getRecursive() */
+    public void getRecursiveTest() {
+        for(int i=1;i<100;++i) {
+            LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+
+            for(int j=0;j<i;++j) {
+                lld1.addLast(j);
+            }
+
+            for(int j=0;j<i;++j) {
+                assertEquals("Should be equal", lld1.getRecursive(j).intValue(), j);
+            }
+        }
+    }
 }

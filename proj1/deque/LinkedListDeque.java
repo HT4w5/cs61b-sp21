@@ -170,7 +170,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         if (index <= revertedIndex) {
             return recursiveGetNext(sentinel.next, index);
         } else {
-            return recursiveGetPrev(sentinel.prev, index);
+            return recursiveGetPrev(sentinel.prev, revertedIndex);
         }
     }
 
@@ -250,7 +250,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         if (index == 0) {
             return node.value;
         }
-        return recursiveGetNext(node.prev, index - 1);
+        return recursiveGetPrev(node.prev, index - 1);
     }
 
 }
