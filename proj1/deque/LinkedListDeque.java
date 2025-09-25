@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  *
  * @param <T> contained value type
  */
-public class LinkedListDeque<T> implements Deque<T> {
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     /**
      * Node class for the LinkedListDeque
      *
@@ -187,6 +187,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         System.out.print('\n');
     }
 
+    @Override
     public Iterator<T> iterator() {
         return new LinkedListDequeIterator();
     }

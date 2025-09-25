@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  *
  * @param <T> contained value type
  */
-public class ArrayDeque<T> implements Deque<T> {
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     /**
      * Iterator class for ArrayDeque
      */
@@ -184,6 +184,7 @@ public class ArrayDeque<T> implements Deque<T> {
         System.out.print('\n');
     }
 
+    @Override
     public Iterator<T> iterator() {
         return new ArrayDequeIterator();
     }
