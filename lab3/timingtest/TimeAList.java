@@ -1,11 +1,13 @@
 package timingtest;
+
 import edu.princeton.cs.algs4.Stopwatch;
 
 /**
  * Created by hug.
  */
 public class TimeAList {
-    private static void printTimingTable(AList<Integer> Ns, AList<Double> times, AList<Integer> opCounts) {
+    private static void printTimingTable(AList<Integer> Ns, AList<Double> times,
+                                         AList<Integer> opCounts) {
         System.out.printf("%12s %12s %12s %12s\n", "N", "time (s)", "# ops", "microsec/op");
         System.out.printf("------------------------------------------------------------\n");
         for (int i = 0; i < Ns.size(); i += 1) {
@@ -22,6 +24,25 @@ public class TimeAList {
     }
 
     public static void timeAListConstruction() {
-        // TODO: YOUR CODE HERE
+        AList<Integer> Ns = new AList<>();
+        AList<Double> times = new AList<>();
+        int n = 1000;
+        for (int i = 0; i < 8; ++i) {
+            Ns.addLast(n);
+            n *= 2;
+        }
+
+        for (int i = 0; i < Ns.size(); ++i) {
+            AList<Integer> testAList = new AList<>();
+            int ops = Ns.get(i);
+            Integer testInt = 1;
+            Stopwatch sw = new Stopwatch();
+            for (int j = 0; j < ops; ++j) {
+                testAList.addLast(testInt);
+            }
+            times.addLast(sw.elapsedTime());
+        }
+
+        printTimingTable(Ns, times, Ns);
     }
 }

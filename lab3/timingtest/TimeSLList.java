@@ -1,11 +1,13 @@
 package timingtest;
+
 import edu.princeton.cs.algs4.Stopwatch;
 
 /**
  * Created by hug.
  */
 public class TimeSLList {
-    private static void printTimingTable(AList<Integer> Ns, AList<Double> times, AList<Integer> opCounts) {
+    private static void printTimingTable(AList<Integer> Ns, AList<Double> times,
+                                         AList<Integer> opCounts) {
         System.out.printf("%12s %12s %12s %12s\n", "N", "time (s)", "# ops", "microsec/op");
         System.out.printf("------------------------------------------------------------\n");
         for (int i = 0; i < Ns.size(); i += 1) {
@@ -22,7 +24,34 @@ public class TimeSLList {
     }
 
     public static void timeGetLast() {
-        // TODO: YOUR CODE HERE
+        AList<Integer> Ns = new AList<>();
+        AList<Double> times = new AList<>();
+        AList<Integer> opCount = new AList<>();
+        int n = 1000;
+        for (int i = 0; i < 8; ++i) {
+            Ns.addLast(n);
+            opCount.addLast(10000);
+            n *= 2;
+        }
+
+        for (int i = 0; i < Ns.size(); ++i) {
+            SLList<Integer> testSLList = new SLList<>();
+            int testN = Ns.get(i);
+            Integer testInt = 1;
+            for (int j = 0; j < testN; ++j) {
+                testSLList.addLast(testInt);
+            }
+
+            Stopwatch sw = new Stopwatch();
+
+            int testOps = opCount.get(i);
+            for (int j = 0; j < testOps; ++j) {
+                testSLList.getLast();
+            }
+            times.addLast(sw.elapsedTime());
+        }
+
+        printTimingTable(Ns, times, opCount);
     }
 
 }
