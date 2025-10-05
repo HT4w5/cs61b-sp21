@@ -5,15 +5,14 @@
  */
 public class Collatz {
 
+    /** Buggy implementation of nextNumber! */
     public static int nextNumber(int n) {
-        if (n == 1) {
-            throw new RuntimeException("1 is the last number");
-        }
-
-        if (n % 2 == 0) {
-            return n / 2;
-        } else {
+        if (n  == 128) {
+            return 1;
+        } else if (n == 5) {
             return 3 * n + 1;
+        } else {
+            return n * 2;
         }
     }
 
