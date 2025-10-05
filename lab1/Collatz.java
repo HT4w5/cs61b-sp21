@@ -5,7 +5,6 @@
  */
 public class Collatz {
 
-    /** Buggy implementation of nextNumber! */
     public static int nextNumber(int n) {
         if (n == 1) {
             throw new RuntimeException("1 is the last number");
@@ -28,3 +27,4 @@ public class Collatz {
         System.out.println();
     }
 }
+
