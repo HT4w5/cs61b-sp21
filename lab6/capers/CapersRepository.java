@@ -57,7 +57,10 @@ public class CapersRepository {
      * @param text String of the text to be appended to the story
      */
     public static void writeStory(String text) {
-        Utils.writeContents(STORY_FILE, text + '\n');
+        String story = new String(readContents(STORY_FILE));
+        story += text + '\n';
+        Utils.writeContents(STORY_FILE, story);
+        System.out.println(story);
     }
 
     /**
