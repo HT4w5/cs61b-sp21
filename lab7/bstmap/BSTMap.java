@@ -59,6 +59,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         // Create sentinel node
         sentinel_ = makeSentinelNode();
         root_ = sentinel_;
+        reset();
     }
 
     // Private methods
@@ -73,6 +74,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     private BSTNode<K, V> root_;
     // Sentinel node attaches to leaf nodes
     private BSTNode<K, V> sentinel_;
+    private Stack<BSTNode<K, V>> refStack_;
 
     // Private methods
     private BSTNode<K, V> makeNode(K k, V v) {
@@ -92,4 +94,53 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         node.value_ = null;
         return node;
     }
+
+    /**
+     * Reset tree traversal state
+     */
+    private void reset() {
+        refStack_ = new Stack<>();
+        refStack_.push(root_);
+    }
+
+    private K getKey() {
+        return refStack_.peek().key_;
+    }
+
+    private V getValue() {
+        return refStack_.peek().value_;
+    }
+
+    /**
+     * Descend the tree in the specified direction
+     *
+     * @param dir false for left, true for right
+     * @return true on success, false on failure
+     */
+    private boolean descend(boolean dir) {
+        var ref = refStack_.peek();
+        if (ref == sentinel_) {
+            return false;
+        }
+        if (dir) {
+            refStack_.push(ref.right_);
+        } else {
+            refStack_.push(ref.left_);
+        }
+        return true;
+    }
+
+    /**
+     * Ascend the tree
+     * @return true on success, false on failure
+     */
+    private boolean ascend() {
+        if (refStack_.size() == 1) {
+            return false;
+        }
+        refStack_.pop();
+        return true;
+    }
+
+
 }
