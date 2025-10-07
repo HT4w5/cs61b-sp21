@@ -17,23 +17,35 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     /* Returns true if this map contains a mapping for the specified key. */
     public boolean containsKey(K key) {
-        return false;
+        var trav = new BSTTraverser<>(root_, sentinel_);
+        return trav.search(key);
     }
 
     /* Returns the value to which the specified key is mapped, or null if this
      * map contains no mapping for the key.
      */
     public V get(K key) {
-        return null;
+        var trav = new BSTTraverser<>(root_, sentinel_);
+        if (!trav.search(key)) {
+            return null;
+        }
+        return trav.getValue();
     }
 
     /* Returns the number of key-value mappings in this map. */
     public int size() {
-        return 0;
+        return size_;
     }
 
     /* Associates the specified value with the specified key in this map. */
     public void put(K key, V value) {
+        var trav = new BSTTraverser<>(root_, sentinel_);
+        if (trav.search(key)) {
+            trav.injectValue(value);
+            return;
+        } else {
+
+        }
     }
 
     /* Returns a Set view of the keys contained in this map. */
@@ -72,8 +84,9 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         V value_;
     }
 
-    private static class BSTTraverser<K, V> {
+    private static class BSTTraverser<K extends Comparable<K>, V> {
         private Stack<BSTNode<K, V>> refStack_;
+        private Stack<Boolean> dirStack_;
         private BSTNode<K, V> root_;
         private BSTNode<K, V> sentinel_;
 
@@ -88,6 +101,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
          */
         public void reset() {
             refStack_ = new Stack<>();
+            dirStack_ = new Stack<>();
             refStack_.push(root_);
         }
 
@@ -97,6 +111,10 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
         public V getValue() {
             return refStack_.peek().value_;
+        }
+
+        public BSTNode<K, V> getNode() {
+            return refStack_.peek();
         }
 
         /**
@@ -115,6 +133,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
             } else {
                 refStack_.push(ref.left_);
             }
+            dirStack_.push(dir);
             return true;
         }
 
@@ -128,16 +147,38 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
                 return false;
             }
             refStack_.pop();
+            dirStack_.pop();
             return true;
         }
 
         /**
          * Search for key in the tree. Set the refStack_ to the found node.
+         *
          * @param key key to search for
          * @return true if exact key found, false if not
          */
         public boolean search(K key) {
             reset();
+            while (true) {
+                var cmp = key.compareTo(getKey());
+                if (cmp == 0) {
+                    return true;
+                }
+                if(!descend(cmp > 0)) {
+                    return false;
+                }
+            }
+        }
+
+        public void injectValue(V value) {
+            refStack_.peek().value_ = value;
+        }
+
+        public void appendNode(K key, V value) {
+            if (refStack_.peek() != sentinel_) {
+                throw new IllegalArgumentException();
+            }
+
         }
     }
 
