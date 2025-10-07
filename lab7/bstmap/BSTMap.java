@@ -3,6 +3,7 @@ package bstmap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     // Public interface
@@ -42,26 +43,43 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         var trav = new BSTTraverser<>(root_, sentinel_);
         if (trav.search(key)) {
             trav.injectValue(value);
-            return;
         } else {
-
+            ++size_;
+            trav.appendNode(key, value);
         }
     }
 
     /* Returns a Set view of the keys contained in this map. */
     public Set<K> keySet() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /* Removes the mapping for the specified key from this map if present. */
     public V remove(K key) {
-        return null;
+        var trav = new BSTTraverser<>(root_, sentinel_);
+        if (!trav.search(key)) {
+            return null;
+        }
+        --size_;
+        var v = trav.getValue();
+        trav.deleteNode();
+        return v;
     }
 
     /* Removes the entry for the specified key only if it is currently mapped to
      * the specified value. */
     public V remove(K key, V value) {
-        return null;
+        var trav = new BSTTraverser<>(root_, sentinel_);
+        if (!trav.search(key)) {
+            return null;
+        }
+        var v = trav.getValue();
+        if (v != value) {
+            return null;
+        }
+        --size_;
+        trav.deleteNode();
+        return v;
     }
 
     public Iterator<K> iterator() {
@@ -152,33 +170,105 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         }
 
         /**
-         * Search for key in the tree. Set the refStack_ to the found node.
+         * Search for key in the tree. Set current node to the node found, or to the closest
+         * sentinel node if not found.
          *
          * @param key key to search for
          * @return true if exact key found, false if not
          */
         public boolean search(K key) {
             reset();
+            if(getNode() == sentinel_) {
+                return false;
+            }
             while (true) {
                 var cmp = key.compareTo(getKey());
                 if (cmp == 0) {
                     return true;
                 }
-                if(!descend(cmp > 0)) {
+                if (!descend(cmp > 0)) {
                     return false;
                 }
             }
         }
 
+        /**
+         * Replace the current node's value with {@code value}.
+         *
+         * @param value
+         */
         public void injectValue(V value) {
             refStack_.peek().value_ = value;
         }
 
+        /**
+         * Replace the current node's key with {@code key} and value with {@code value}.
+         *
+         * @param key
+         * @param value
+         */
+        public void injectKV(K key, V value) {
+            refStack_.peek().key_ = key;
+            refStack_.peek().value_ = value;
+        }
+
+        /**
+         * Append a new node at the current sentinel node. Current node must be sentinel node.
+         *
+         * @param key   key for new node
+         * @param value value for new node
+         * @throws IllegalArgumentException if current node is not the sentinel node
+         */
         public void appendNode(K key, V value) {
             if (refStack_.peek() != sentinel_) {
                 throw new IllegalArgumentException();
             }
+            refStack_.pop();
+            if(dirStack_.isEmpty()) {
 
+            }
+            if (dirStack_.peek()) {
+                refStack_.peek().right_ = makeNode(key, value, sentinel_);
+                refStack_.push(refStack_.peek().right_);
+            } else {
+                refStack_.peek().left_ = makeNode(key, value, sentinel_);
+                refStack_.push(refStack_.peek().left_);
+            }
+        }
+
+        public void deleteNode() {
+            var ref = refStack_.pop();
+            if (ref.left_ == sentinel_ && ref.right_ == sentinel_) {
+                if (dirStack_.peek()) {
+                    refStack_.peek().right_ = sentinel_;
+                } else {
+                    refStack_.peek().left_ = sentinel_;
+                }
+            } else if (ref.left_ != sentinel_ && ref.right_ != sentinel_) {
+                // Find max node smaller than current
+                var trav = new BSTTraverser<>(ref, sentinel_);
+                trav.findMax();
+                injectKV(trav.getKey(), trav.getValue());
+                trav.deleteNode();
+            } else {
+                BSTNode<K, V> next;
+                if (ref.left_ != sentinel_) {
+                    next = ref.left_;
+                } else {
+                    next = ref.right_;
+                }
+                if (dirStack_.peek()) {
+                    refStack_.peek().right_ = next;
+                } else {
+                    refStack_.peek().left_ = next;
+                }
+            }
+        }
+
+        public void findMax() {
+            reset();
+            while (descend(true)) {
+            }
         }
     }
 
@@ -188,10 +278,10 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     private BSTNode<K, V> sentinel_;
 
     // Private methods
-    private BSTNode<K, V> makeNode(K k, V v) {
+    private static <K, V> BSTNode<K, V> makeNode(K k, V v, BSTNode<K, V> sentinel) {
         BSTNode<K, V> node = new BSTNode<>();
-        node.left_ = sentinel_;
-        node.right_ = sentinel_;
+        node.left_ = sentinel;
+        node.right_ = sentinel;
         node.key_ = k;
         node.value_ = v;
         return node;
