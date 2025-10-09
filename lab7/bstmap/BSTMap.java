@@ -51,4 +51,42 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     public Iterator<K> iterator() {
         return null;
     }
+
+    // Constructor
+    public BSTMap() {
+        size_ = 0;
+        sentinel_ = makeSentinel();
+        root_ = sentinel_;
+    }
+
+    // Static
+    private static class BSTNode<K,V> {
+        BSTNode<K,V> left_;
+        BSTNode<K,V> right_;
+        K key_;
+        V value_;
+    }
+
+    private static <K,V> BSTNode<K,V> makeNode(K key, V value, BSTNode<K,V> sentinel) {
+        BSTNode<K,V> node = new BSTNode<>();
+        node.left_ = sentinel;
+        node.right_ = sentinel;
+        node.key_ = key;
+        node.value_ = value;
+        return node;
+    }
+
+    private static <K,V> BSTNode<K,V> makeSentinel() {
+        BSTNode<K,V> node = new BSTNode<>();
+        node.left_ = null;
+        node.right_ = null;
+        node.key_ = null;
+        node.value_ = null;
+        return node;
+    }
+
+    // Private members
+    private BSTNode<K,V> root_;
+    private BSTNode<K,V> sentinel_;
+    private int size_;
 }
