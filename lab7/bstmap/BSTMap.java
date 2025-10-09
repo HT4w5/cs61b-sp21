@@ -1,5 +1,6 @@
 package bstmap;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -44,7 +45,74 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     /* Returns a Set view of the keys contained in this map. */
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        return new Set<K>() {
+            @Override
+            public int size() {
+                return BSTMap.this.root_.size_;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return BSTMap.this.root_.size_ == 0;
+            }
+
+            @Override
+            public boolean contains(Object o) {
+                @SuppressWarnings("unchecked")
+                K key = (K) o;
+                return BSTMap.this.containsKey(key);
+            }
+
+            @Override
+            public Iterator<K> iterator() {
+                return null;
+            }
+
+            @Override
+            public Object[] toArray() {
+                return new Object[0];
+            }
+
+            @Override
+            public <T> T[] toArray(T[] ts) {
+                return null;
+            }
+
+            @Override
+            public boolean add(K k) {
+                return false;
+            }
+
+            @Override
+            public boolean remove(Object o) {
+                return false;
+            }
+
+            @Override
+            public boolean containsAll(Collection<?> collection) {
+                return false;
+            }
+
+            @Override
+            public boolean addAll(Collection<? extends K> collection) {
+                return false;
+            }
+
+            @Override
+            public boolean retainAll(Collection<?> collection) {
+                return false;
+            }
+
+            @Override
+            public boolean removeAll(Collection<?> collection) {
+                return false;
+            }
+
+            @Override
+            public void clear() {
+
+            }
+        }
     }
 
     /* Removes the mapping for the specified key from this map if present. */
@@ -122,7 +190,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     // Private members
     private BSTNode<K, V> root_;
-    private BSTNode<K, V> sentinel_;
+    private final BSTNode<K, V> sentinel_;
 
     // Private methods
     private BSTNode<K, V> find(K key) {
