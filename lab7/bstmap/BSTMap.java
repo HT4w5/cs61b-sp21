@@ -1,6 +1,7 @@
 package bstmap;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
@@ -48,13 +49,25 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     /* Removes the mapping for the specified key from this map if present. */
     public V remove(K key) {
-        return null;
+        BSTNode<K, V> res = find(key);
+        if (res == sentinel_) {
+            return null;
+        }
+        sentinel_.key_ = key;
+        root_ = removeRec(root_, key);
+        return res.value_;
     }
 
     /* Removes the entry for the specified key only if it is currently mapped to
      * the specified value. */
     public V remove(K key, V value) {
-        return null;
+        BSTNode<K, V> res = find(key);
+        if (res == sentinel_ || res.value_ != value) {
+            return null;
+        }
+        sentinel_.key_ = key;
+        root_ = removeRec(root_, key);
+        return res.value_;
     }
 
     public Iterator<K> iterator() {
@@ -141,5 +154,59 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         }
         node.size_ = node.left_.size_ + node.right_.size_ + 1;
         return node;
+    }
+
+    private static <K extends Comparable<K>, V> BSTNode<K, V> removeRec(BSTNode<K, V> node, K key) {
+        var cmp = key.compareTo(node.key_);
+        if (cmp == 0) {
+            if (node.left_.size_ == 0) {
+                return node.right_;
+            }
+            if (node.right_.size_ == 0) {
+                return node.left_;
+            }
+            BSTNode<K, V> old = node;
+            node = getMinRec(old.right_);
+            node.right_ = removeMinRec(old.right_);
+            node.left_ = old.left_;
+        } else if (cmp < 0) {
+            node.left_ = removeRec(node.left_, key);
+        } else {
+            node.right_ = removeRec(node.right_, key);
+        }
+        node.size_ = node.left_.size_ + node.right_.size_ + 1;
+        return node;
+    }
+
+    private static <K extends Comparable<K>, V> BSTNode<K, V> removeMinRec(BSTNode<K, V> node) {
+        if (node.left_.size_ == 0) {
+            return node.right_;
+        }
+        node.left_ = removeMinRec(node.left_);
+        node.size_ = node.left_.size_ + node.right_.size_ + 1;
+        return node;
+    }
+
+    private static <K extends Comparable<K>, V> BSTNode<K, V> removeMaxRec(BSTNode<K, V> node) {
+        if (node.right_.size_ == 0) {
+            return node.left_;
+        }
+        node.right_ = removeMaxRec(node.right_);
+        node.size_ = node.left_.size_ + node.right_.size_ + 1;
+        return node;
+    }
+
+    private static <K extends Comparable<K>, V> BSTNode<K, V> getMinRec(BSTNode<K, V> node) {
+        if (node.left_.size_ == 0) {
+            return node;
+        }
+        return getMinRec(node.left_);
+    }
+
+    private static <K extends Comparable<K>, V> BSTNode<K, V> getMaxRec(BSTNode<K, V> node) {
+        if (node.right_.size_ == 0) {
+            return node;
+        }
+        return getMaxRec(node.right_);
     }
 }
