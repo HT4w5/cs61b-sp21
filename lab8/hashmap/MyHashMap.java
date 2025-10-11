@@ -19,7 +19,12 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     /**
      * Removes all of the mappings from this map.
      */
-    public void clear() {}
+    @SuppressWarnings("unchecked")
+    public void clear() {
+        allocatedSize_ = initialSize_;
+        logicalSize_ = 0;
+        bucket_ = new Collection[initialSize_];
+    }
 
     /**
      * Returns true if this map contains a mapping for the specified key.
@@ -40,7 +45,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * Returns the number of key-value mappings in this map.
      */
     public int size() {
-        return 0;
+        return logicalSize_;
     }
 
     /**
@@ -48,7 +53,8 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * If the map previously contained a mapping for the key,
      * the old value is replaced.
      */
-    public void put(K key, V value) {}
+    public void put(K key, V value) {
+    }
 
     /**
      * Returns a Set view of the keys contained in this map.
@@ -93,17 +99,28 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         }
     }
 
-    /* Instance Variables */
-    private Collection<Node>[] buckets;
-    // You should probably define some more!
-
     /**
      * Constructors
      */
+    @SuppressWarnings("unchecked")
     public MyHashMap() {
+        initialSize_ = DEFAULT_INITIAL_SIZE;
+        allocatedSize_ = initialSize_;
+        maxLoad_ = DEFAULT_MAX_LOAD;
+        bucket_ = new Collection[allocatedSize_];
+        logicalSize_ = 0;
     }
 
+    @SuppressWarnings("unchecked")
     public MyHashMap(int initialSize) {
+        if (initialSize < 1) {
+            throw new IllegalArgumentException();
+        }
+        initialSize_ = initialSize;
+        allocatedSize_ = initialSize_;
+        maxLoad_ = DEFAULT_MAX_LOAD;
+        bucket_ = new Collection[allocatedSize_];
+        logicalSize_ = 0;
     }
 
     /**
@@ -113,7 +130,16 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * @param initialSize initial size of backing array
      * @param maxLoad     maximum load factor
      */
+    @SuppressWarnings("unchecked")
     public MyHashMap(int initialSize, double maxLoad) {
+        if (initialSize < 1 || maxLoad <= 0.0) {
+            throw new IllegalArgumentException();
+        }
+        initialSize_ = initialSize;
+        allocatedSize_ = initialSize_;
+        maxLoad_ = maxLoad;
+        bucket_ = new Collection[allocatedSize_];
+        logicalSize_ = 0;
     }
 
     /**
@@ -158,7 +184,14 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return null;
     }
 
-    // TODO: Implement the methods of the Map61B Interface below
-    // Your code won't compile until you do so!
+
+    // Private members
+    private Collection<Node>[] bucket_;
+    private final int initialSize_;
+    private int allocatedSize_;
+    private int logicalSize_;
+    private final double maxLoad_;
+    private final static double DEFAULT_MAX_LOAD = 0.75;
+    private final static int DEFAULT_INITIAL_SIZE = 16;
 
 }
