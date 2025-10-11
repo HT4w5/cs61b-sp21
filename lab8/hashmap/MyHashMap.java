@@ -1,9 +1,6 @@
 package hashmap;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A hash table-backed Map implementation. Provides amortized constant time
@@ -114,8 +111,9 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public Iterator<K> iterator() {
-        return null;
+        return new MyHashMapIterator();
     }
 
     /**
@@ -129,6 +127,53 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         Node(K k, V v) {
             key = k;
             value = v;
+        }
+    }
+
+    private class MyHashMapIterator implements Iterator<K> {
+        int idx_;
+        int bucketIdx_;
+        Iterator<Node> bucketIt_;
+
+        MyHashMapIterator() {
+            idx_ = 0;
+            bucketIdx_ = 0;
+            if (logicalSize_ == 0) {
+                // Empty table
+                bucketIt_ = null;
+                return;
+            }
+            // Find first valid bucket
+            // Make sure bucketIt_ isn't null at first
+            while (buckets_[bucketIdx_] == null) {
+                ++bucketIdx_;
+            }
+            bucketIt_ = buckets_[bucketIdx_].iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return idx_ < logicalSize_;
+        }
+
+        @Override
+        public K next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            // Current bucket still has more Nodes
+            if (bucketIt_.hasNext()) {
+                ++idx_;
+                return bucketIt_.next().key;
+            }
+            // Find next valid bucket
+            do {
+                ++bucketIdx_;
+            } while (buckets_[bucketIdx_] == null);
+            // Assume that existing buckets are not empty (remove() makes sure this is true)
+            bucketIt_ = buckets_[bucketIdx_].iterator();
+            ++idx_;
+            return bucketIt_.next().key;
         }
     }
 

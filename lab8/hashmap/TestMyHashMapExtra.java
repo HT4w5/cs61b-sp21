@@ -1,9 +1,16 @@
 package hashmap;
 
 import static org.junit.Assert.*;
-import org.junit.Test;
 
-/** Tests of optional parts of lab 8. */
+import org.junit.Test;
+import speed.StringUtils;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Tests of optional parts of lab 8.
+ */
 public class TestMyHashMapExtra {
 
     @Test
@@ -22,7 +29,7 @@ public class TestMyHashMapExtra {
         assertTrue(q.containsKey("e"));
     }
 
-    /** 
+    /**
      * Remove Test 2
      * Test the 3 different cases of remove
      */
@@ -48,5 +55,49 @@ public class TestMyHashMapExtra {
         assertTrue(q.containsKey("a"));
         assertTrue(q.containsKey("b"));
         assertTrue(q.containsKey("f"));
+    }
+
+    @Test
+    public void testIteratorInOrder() {
+        String s = "a";
+        MyHashMap<String, String> q = new MyHashMap<>();
+        Set<String> record = new HashSet<>();
+        for (int i = 0; i < 1000; ++i) {
+            q.put(s, s);
+            record.add(s);
+            s = StringUtils.nextString(s);
+        }
+
+        var it = q.iterator();
+        for (int i = 0; i < 1000; ++i) {
+            assertTrue(it.hasNext());
+            String res = it.next();
+            assertTrue(record.contains(res));
+            record.remove(res);
+        }
+        assertFalse(it.hasNext());
+        assertTrue(record.isEmpty());
+    }
+
+    @Test
+    public void testIteratorRandom() {
+        String s;
+        MyHashMap<String, String> q = new MyHashMap<>();
+        Set<String> record = new HashSet<>();
+        for (int i = 0; i < 1000; ++i) {
+            s = StringUtils.randomString(10);
+            q.put(s, s);
+            record.add(s);
+        }
+
+        var it = q.iterator();
+        for (int i = 0; i < 1000; ++i) {
+            assertTrue(it.hasNext());
+            String res = it.next();
+            assertTrue(record.contains(res));
+            record.remove(res);
+        }
+        assertFalse(it.hasNext());
+        assertTrue(record.isEmpty());
     }
 }
