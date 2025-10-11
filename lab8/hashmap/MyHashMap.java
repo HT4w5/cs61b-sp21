@@ -1,5 +1,6 @@
 package hashmap;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -19,17 +20,25 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     /**
      * Removes all of the mappings from this map.
      */
-    @SuppressWarnings("unchecked")
     public void clear() {
         allocatedSize_ = initialSize_;
         logicalSize_ = 0;
-        bucket_ = new Collection[initialSize_];
+        buckets_ = createTable(initialSize_);
     }
 
     /**
      * Returns true if this map contains a mapping for the specified key.
      */
     public boolean containsKey(K key) {
+        int idx = getIndex(key);
+        if (buckets_[idx] == null) {
+            return false;
+        }
+        for (Node n : buckets_[idx]) {
+            if (n.key.equals(key)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -38,6 +47,15 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * map contains no mapping for the key.
      */
     public V get(K key) {
+        int idx = getIndex(key);
+        if (buckets_[idx] == null) {
+            return null;
+        }
+        for (Node n : buckets_[idx]) {
+            if (n.key.equals(key)) {
+                return n.value;
+            }
+        }
         return null;
     }
 
@@ -54,13 +72,28 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * the old value is replaced.
      */
     public void put(K key, V value) {
+        int idx = getIndex(key);
+        if (buckets_[idx] == null) {
+            buckets_[idx] = createBucket();
+        } else {
+            for (Node n : buckets_[idx]) {
+                if (n.key.equals(key)) {
+                    n.value = value;
+                    return;
+                }
+            }
+        }
+        ++logicalSize_;
+        buckets_[idx].add(createNode(key, value));
+
+        doUpscale();
     }
 
     /**
      * Returns a Set view of the keys contained in this map.
      */
     public Set<K> keySet() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -102,16 +135,14 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     /**
      * Constructors
      */
-    @SuppressWarnings("unchecked")
     public MyHashMap() {
         initialSize_ = DEFAULT_INITIAL_SIZE;
         allocatedSize_ = initialSize_;
         maxLoad_ = DEFAULT_MAX_LOAD;
-        bucket_ = new Collection[allocatedSize_];
+        buckets_ = createTable(allocatedSize_);
         logicalSize_ = 0;
     }
 
-    @SuppressWarnings("unchecked")
     public MyHashMap(int initialSize) {
         if (initialSize < 1) {
             throw new IllegalArgumentException();
@@ -119,7 +150,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         initialSize_ = initialSize;
         allocatedSize_ = initialSize_;
         maxLoad_ = DEFAULT_MAX_LOAD;
-        bucket_ = new Collection[allocatedSize_];
+        buckets_ = createTable(allocatedSize_);
         logicalSize_ = 0;
     }
 
@@ -130,7 +161,6 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * @param initialSize initial size of backing array
      * @param maxLoad     maximum load factor
      */
-    @SuppressWarnings("unchecked")
     public MyHashMap(int initialSize, double maxLoad) {
         if (initialSize < 1 || maxLoad <= 0.0) {
             throw new IllegalArgumentException();
@@ -138,7 +168,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         initialSize_ = initialSize;
         allocatedSize_ = initialSize_;
         maxLoad_ = maxLoad;
-        bucket_ = new Collection[allocatedSize_];
+        buckets_ = createTable(allocatedSize_);
         logicalSize_ = 0;
     }
 
@@ -146,7 +176,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * Returns a new node to be placed in a hash table bucket
      */
     private Node createNode(K key, V value) {
-        return null;
+        return new Node(key, value);
     }
 
     /**
@@ -168,7 +198,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * OWN BUCKET DATA STRUCTURES WITH THE NEW OPERATOR!
      */
     protected Collection<Node> createBucket() {
-        return null;
+        return new ArrayList<>();
     }
 
     /**
@@ -180,13 +210,46 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      *
      * @param tableSize the size of the table to create
      */
+    @SuppressWarnings("unchecked")
     private Collection<Node>[] createTable(int tableSize) {
-        return null;
+        return new Collection[tableSize];
+    }
+
+    /**
+     * Get key index in hash table
+     *
+     * @param key
+     * @return index
+     */
+    private int getIndex(K key) {
+        return Math.floorMod(key.hashCode(), allocatedSize_);
+    }
+
+    private void doUpscale() {
+        if ((double) logicalSize_ / allocatedSize_ < maxLoad_) {
+            return;
+        }
+        allocatedSize_ *= 2;
+        // Rehash
+        var newTable = createTable(allocatedSize_);
+        for (Collection<Node> b : buckets_) {
+            if (b == null) {
+                continue;
+            }
+            for (Node n : b) {
+                int idx = getIndex(n.key);
+                if (newTable[idx] == null) {
+                    newTable[idx] = createBucket();
+                }
+                newTable[idx].add(n);
+            }
+        }
+        buckets_ = newTable;
     }
 
 
     // Private members
-    private Collection<Node>[] bucket_;
+    private Collection<Node>[] buckets_;
     private final int initialSize_;
     private int allocatedSize_;
     private int logicalSize_;
