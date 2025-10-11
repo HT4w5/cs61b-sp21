@@ -145,8 +145,8 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
             @Override
             public boolean containsAll(Collection<?> collection) {
-                for(Object o : collection) {
-                    if(!contains(o)) {
+                for (Object o : collection) {
+                    if (!contains(o)) {
                         return false;
                     }
                 }
