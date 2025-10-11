@@ -90,7 +90,89 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * Returns a Set view of the keys contained in this map.
      */
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        return new Set<K>() {
+            @Override
+            public int size() {
+                return MyHashMap.this.logicalSize_;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return MyHashMap.this.logicalSize_ == 0;
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public boolean contains(Object o) {
+                return MyHashMap.this.containsKey((K) o);
+            }
+
+            @Override
+            public Iterator<K> iterator() {
+                return new MyHashMapIterator();
+            }
+
+            @Override
+            public Object[] toArray() {
+                var it = new MyHashMapIterator();
+                Object[] arr = new Object[logicalSize_];
+                for (int i = 0; i < logicalSize_; ++i) {
+                    arr[i] = it.next();
+                }
+                return arr;
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T> T[] toArray(T[] ts) {
+                return (T[]) toArray();
+            }
+
+            @Override
+            public boolean add(K k) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public boolean remove(Object o) {
+                if (MyHashMap.this.remove((K) o) == null) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public boolean containsAll(Collection<?> collection) {
+                for(Object o : collection) {
+                    if(!contains(o)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public boolean addAll(Collection<? extends K> collection) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean retainAll(Collection<?> collection) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean removeAll(Collection<?> collection) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void clear() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     /**
