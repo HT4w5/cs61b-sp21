@@ -99,7 +99,19 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * UnsupportedOperationException.
      */
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+        int idx = getIndex(key);
+        if (buckets_[idx] == null) {
+            return null;
+        }
+        for (Node n : buckets_[idx]) {
+            if (n.key.equals(key)) {
+                V val = n.value;
+                buckets_[idx].remove(n);
+                --logicalSize_;
+                return val;
+            }
+        }
+        return null;
     }
 
     /**
@@ -108,7 +120,22 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * throw an UnsupportedOperationException.
      */
     public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+        int idx = getIndex(key);
+        if (buckets_[idx] == null) {
+            return null;
+        }
+        for (Node n : buckets_[idx]) {
+            if (n.key.equals(key)) {
+                if (n.value != value) {
+                    return null;
+                }
+                V val = n.value;
+                buckets_[idx].remove(n);
+                --logicalSize_;
+                return val;
+            }
+        }
+        return null;
     }
 
     @Override
