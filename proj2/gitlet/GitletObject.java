@@ -11,6 +11,10 @@ import static gitlet.Utils.sha1;
 public abstract class GitletObject<Data extends Serializable> {
     private static final File OBJECTS_FOLDER = join(Repository.GITLET_DIR, "objects");
 
+    /**
+     * Read an existing GitletObject from filesystem
+     * @param sha1 SHA-1 hash hex-string
+     */
     public GitletObject(String sha1) {
         // Read data from filesystem
         File f = join(OBJECTS_FOLDER, sha1);
@@ -25,6 +29,8 @@ public abstract class GitletObject<Data extends Serializable> {
             throw new GitletException("object SHA-1 mismatch");
         }
     }
+
+    public GitletObject() {}
 
     public void save() {
         computeSha1();
