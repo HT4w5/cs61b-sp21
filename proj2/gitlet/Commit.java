@@ -36,18 +36,7 @@ public class Commit extends GitletObject<Commit.Data> {
     }
 
     // Public methods
-    public void setParent(String parent, String altParent) {
-        data_.parent_ = parent;
-        data_.altParent_ = altParent;
-    }
 
-    public void setParent(String parent) {
-        data_.parent_ = parent;
-    }
-
-    public void setMessage(String msg) {
-        data_.msg_ = msg;
-    }
 
     // Static
     public static class Data implements Serializable, ToBytesConvertible {

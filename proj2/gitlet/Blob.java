@@ -76,4 +76,8 @@ public class Blob extends GitletObject<Blob.Data> {
         File f = join(Repository.CWD, data_.filename_);
         writeContents(f, (Object) data_.content_);
     }
+
+    public String getFilename() {
+        return data_.filename_;
+    }
 }

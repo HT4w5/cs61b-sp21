@@ -37,12 +37,20 @@ public class Index {
         writeObject(INDEX, indexMap_);
     }
 
-    public void putEntry(String filename, String blobHash) {
+    public boolean hasFile(String filename) {
+        return indexMap_.containsKey(filename);
+    }
+
+    public void putFile(String filename, String blobHash) {
         indexMap_.put(filename, blobHash);
     }
 
-    public void removeEntry(String filename) {
+    public void removeFile(String filename) {
         indexMap_.remove(filename);
+    }
+
+    public String getFile(String filename) {
+        return indexMap_.get(filename);
     }
 
     public Set<Map.Entry<String, String>> entrySet() {

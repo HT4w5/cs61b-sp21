@@ -1,17 +1,23 @@
 package gitlet;
 
 import java.io.File;
+
 import static gitlet.Utils.*;
 
-/** Represents a gitlet repository.
+/**
+ * Represents a gitlet repository.
  *
- *  @author John Doe
+ * @author John Doe
  */
 public class Repository {
 
-    /** The current working directory. */
+    /**
+     * The current working directory.
+     */
     public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet directory. */
+    /**
+     * The .gitlet directory.
+     */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File OBJECTS_FOLDER = join(GITLET_DIR, "objects");
     public static final String DEFAULT_BRANCH = "master";
@@ -23,10 +29,10 @@ public class Repository {
     }
 
     public static void initRepo() {
-        if(repoExists()) {
+        if (repoExists()) {
             throw new GitletException("Repo exists");
         }
-        if(!GITLET_DIR.mkdir() || !OBJECTS_FOLDER.mkdir()) {
+        if (!GITLET_DIR.mkdir() || !OBJECTS_FOLDER.mkdir()) {
             throw new GitletException("Failed to init repo");
         }
 
@@ -46,6 +52,24 @@ public class Repository {
         Branches branches = Branches.createEmpty();
         branches.createBranch(DEFAULT_BRANCH, ic.getSHA1Hash());
         branches.save();
+    }
+
+    public static void addFile(String filename) {
+        if (filename.equals(".gitlet")) {
+            throw new GitletException("Can't add .gitlet directory");
+        }
+
+        Index index = Index.fromFilesystem();
+        // Create blob
+        Blob blob = Blob.fromFileName(filename);
+
+        String oldBlobHash = index.getFile(filename);
+        if (oldBlobHash != null && oldBlobHash.equals(blob.getSHA1Hash())) {
+            return;
+        }
+        // TODO: compare to head commit
+        blob.save();
+        index.putFile(filename, blob.getSHA1Hash());
     }
 
 }
