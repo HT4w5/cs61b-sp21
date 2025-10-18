@@ -3,6 +3,8 @@ package gitlet;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.io.ByteArrayOutputStream;
 
 import static gitlet.Utils.*;
 
@@ -18,9 +20,19 @@ public class Blob extends GitletObject<Blob.Data> {
     }
 
     // Static
-    public static class Data implements Serializable {
+    public static class Data implements Serializable, ToBytesConvertible {
         public String filename_;
         public byte[] content_;
+
+        @Override
+        public byte[] toByteArray() {
+            byte[] filenameBytes = filename_.getBytes(StandardCharsets.UTF_8);
+            int len = filenameBytes.length + content_.length;
+            byte[] result = new byte[len];
+            System.arraycopy(filenameBytes, 0, result, 0, filenameBytes.length);
+            System.arraycopy(content_, 0, result, filenameBytes.length, content_.length);
+            return result;
+        }
     }
 
     /**

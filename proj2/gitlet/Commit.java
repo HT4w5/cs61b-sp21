@@ -1,26 +1,107 @@
 package gitlet;
 
-// TODO: any imports you need here
 
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.io.ByteArrayOutputStream;
 
-/** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
+/**
+ * Represents a gitlet commit object.
  *
- *  @author TODO
+ * @author John Doe
  */
-public class Commit {
+public class Commit extends GitletObject<Commit.Data> {
+    // Constructors
+
     /**
-     * TODO: add instance variables here.
+     * Read commit from filesystem by SHA-1 hash
      *
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
+     * @param sha1 SHA-1 hash
      */
+    private Commit(String sha1) {
+        super(sha1);
+    }
 
-    /** The message of this Commit. */
-    private String message;
+    /**
+     * Create new Commit
+     */
+    private Commit() {
+        super();
+    }
 
-    /* TODO: fill in the rest of this class. */
+    // Public methods
+    public void setParent(String parent, String altParent) {
+        data_.parent_ = parent;
+        data_.altParent_ = altParent;
+    }
+
+    public void setParent(String parent) {
+        data_.parent_ = parent;
+    }
+
+    public void setMessage(String msg) {
+        data_.msg_ = msg;
+    }
+
+    // Static
+    public static class Data implements Serializable, ToBytesConvertible {
+        public Instant timestamp_;
+        public String msg_;
+        /* maps filename to blob hash */
+        public TreeMap<String, String> files_;
+        public String parent_;
+        public String altParent_;
+
+        public Data() {
+            files_ = new TreeMap<>();
+        }
+
+        @Override
+        public byte[] toByteArray() {
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            try {
+                result.write(timestamp_.toString().getBytes(StandardCharsets.UTF_8));
+                result.write(msg_.getBytes(StandardCharsets.UTF_8));
+                var fileSet = files_.entrySet();
+                for (var e : fileSet) {
+                    result.write(e.getKey().getBytes(StandardCharsets.UTF_8));
+                    result.write(e.getValue().getBytes(StandardCharsets.UTF_8));
+                }
+                if (parent_ != null) {
+                    result.write(parent_.getBytes(StandardCharsets.UTF_8));
+                }
+                if (altParent_ != null) {
+                    result.write(altParent_.getBytes(StandardCharsets.UTF_8));
+                }
+            } catch (IOException e) {
+                System.out.println("Failed to convert Commit.Data into byte array");
+                System.exit(0);
+            }
+            return result.toByteArray();
+        }
+    }
+
+    public static Commit createEmpty() {
+        Commit c = new Commit();
+        c.data_ = new Commit.Data();
+        c.data_.timestamp_ = Instant.now();
+        c.data_.parent_ = null;
+        c.data_.altParent_ = null;
+        return c;
+    }
+
+    public static Commit createFromIndex(Index i) {
+        var entries = i.entrySet();
+        var c = createEmpty();
+        entries.forEach(entry -> {
+            c.data_.files_.put(entry.getKey(), entry.getValue());
+        });
+        return c;
+    }
+
+    // Private members
 }

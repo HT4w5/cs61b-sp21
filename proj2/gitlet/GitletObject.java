@@ -8,7 +8,7 @@ import static gitlet.Utils.readObject;
 import static gitlet.Utils.writeObject;
 import static gitlet.Utils.sha1;
 
-public abstract class GitletObject<Data extends Serializable> {
+public abstract class GitletObject<Data extends ToBytesConvertible & Serializable> {
     private static final File OBJECTS_FOLDER = join(Repository.GITLET_DIR, "objects");
 
     /**
@@ -47,6 +47,6 @@ public abstract class GitletObject<Data extends Serializable> {
     private String sha1_;
 
     private void computeSha1() {
-        sha1_ = sha1(data_.toString());
+        sha1_ = sha1((Object) data_.toByteArray());
     }
 }
