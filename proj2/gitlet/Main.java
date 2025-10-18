@@ -16,7 +16,11 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                // TODO: handle the `init` command
+                if(Repository.repoExists()) {
+                    System.out.println("A Gitlet version-control system already exists in the current directory.");
+                    System.exit(0);
+                }
+                Repository.initRepo();
                 break;
             case "add":
                 // TODO: handle the `add [filename]` command

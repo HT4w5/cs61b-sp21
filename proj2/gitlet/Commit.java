@@ -103,5 +103,14 @@ public class Commit extends GitletObject<Commit.Data> {
         return c;
     }
 
+    public static Commit createInitial() {
+        Commit c = new Commit();
+        c.data_ = new Commit.Data();
+        c.data_.timestamp_ = Instant.EPOCH;
+        c.data_.parent_ = null;
+        c.data_.altParent_ = null;
+        return c;
+    }
+
     // Private members
 }

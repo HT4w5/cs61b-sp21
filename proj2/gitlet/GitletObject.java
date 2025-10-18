@@ -3,16 +3,14 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 
-import static gitlet.Utils.join;
-import static gitlet.Utils.readObject;
-import static gitlet.Utils.writeObject;
-import static gitlet.Utils.sha1;
+import static gitlet.Utils.*;
 
 public abstract class GitletObject<Data extends ToBytesConvertible & Serializable> {
     private static final File OBJECTS_FOLDER = join(Repository.GITLET_DIR, "objects");
 
     /**
      * Read an existing GitletObject from filesystem
+     *
      * @param sha1 SHA-1 hash hex-string
      */
     public GitletObject(String sha1) {
@@ -30,7 +28,9 @@ public abstract class GitletObject<Data extends ToBytesConvertible & Serializabl
         }
     }
 
-    public GitletObject() {}
+    public GitletObject() {
+        sha1_ = null;
+    }
 
     public void save() {
         computeSha1();
@@ -41,12 +41,19 @@ public abstract class GitletObject<Data extends ToBytesConvertible & Serializabl
         writeObject(f, data_);
     }
 
+    public String getSHA1Hash() {
+        computeSha1();
+        return sha1_;
+    }
+
     // Private / Protected members
     /* serializable class representing all data stored in filesystem */
     protected Data data_;
     private String sha1_;
 
     private void computeSha1() {
-        sha1_ = sha1((Object) data_.toByteArray());
+        if (sha1_ == null) {
+            sha1_ = sha1((Object) data_.toByteArray());
+        }
     }
 }

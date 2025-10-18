@@ -3,27 +3,49 @@ package gitlet;
 import java.io.File;
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
-
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
  *
- *  @author TODO
+ *  @author John Doe
  */
 public class Repository {
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Repository class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided two examples for you.
-     */
 
     /** The current working directory. */
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
+    public static final File OBJECTS_FOLDER = join(GITLET_DIR, "objects");
+    public static final String DEFAULT_BRANCH = "master";
 
-    /* TODO: fill in the rest of this class. */
+
+    // Static
+    public static boolean repoExists() {
+        return GITLET_DIR.exists();
+    }
+
+    public static void initRepo() {
+        if(repoExists()) {
+            throw new GitletException("Repo exists");
+        }
+        if(!GITLET_DIR.mkdir() || !OBJECTS_FOLDER.mkdir()) {
+            throw new GitletException("Failed to init repo");
+        }
+
+        // Create index file
+        Index index = Index.createEmpty();
+        index.save();
+
+        // Create initial commit
+        Commit ic = Commit.createInitial();
+        ic.save();
+
+        // Create head file
+        Head head = Head.createEmpty(DEFAULT_BRANCH);
+        head.save();
+
+        // Create branches file
+        Branches branches = Branches.createEmpty();
+        branches.createBranch(DEFAULT_BRANCH, ic.getSHA1Hash());
+        branches.save();
+    }
+
 }
