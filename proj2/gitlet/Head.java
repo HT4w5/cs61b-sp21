@@ -17,8 +17,8 @@ public class Head implements Serializable {
         return readObject(HEAD, Head.class);
     }
 
-    public static Head createEmpty(String branch) {
-        return new Head(branch);
+    public static Head createEmpty() {
+        return new Head();
     }
 
     // Public methods
@@ -34,11 +34,20 @@ public class Head implements Serializable {
         branch_ = branch;
     }
 
-    // Constructor
-    private Head(String branch) {
-        branch_ = branch;
+    public String getHash() {
+        return hash_;
+    }
+
+    public void setHash(String hash) {
+        hash_ = hash;
+    }
+
+    public void set(String branchName, String headHash) {
+        branch_ = branchName;
+        hash_ = headHash;
     }
 
     // Private members
     private String branch_;
+    private String hash_;
 }

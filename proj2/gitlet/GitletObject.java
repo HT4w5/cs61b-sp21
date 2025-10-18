@@ -2,10 +2,12 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import static gitlet.Utils.*;
 
 public abstract class GitletObject<Data extends ToBytesConvertible & Serializable> {
+    // Static
     private static final File OBJECTS_FOLDER = join(Repository.GITLET_DIR, "objects");
 
     /**
@@ -13,7 +15,7 @@ public abstract class GitletObject<Data extends ToBytesConvertible & Serializabl
      *
      * @param sha1 SHA-1 hash hex-string
      */
-    public GitletObject(String sha1) {
+    protected GitletObject(String sha1) {
         // Read data from filesystem
         File f = join(OBJECTS_FOLDER, sha1);
         if (!f.exists()) {
@@ -23,12 +25,12 @@ public abstract class GitletObject<Data extends ToBytesConvertible & Serializabl
 
         // Validate SHA-1
         computeSha1();
-        if (sha1_.equals(sha1)) {
+        if (!sha1_.equals(sha1)) {
             throw new GitletException("object SHA-1 mismatch");
         }
     }
 
-    public GitletObject() {
+    protected GitletObject() {
         sha1_ = null;
     }
 
@@ -55,5 +57,11 @@ public abstract class GitletObject<Data extends ToBytesConvertible & Serializabl
         if (sha1_ == null) {
             sha1_ = sha1((Object) data_.toByteArray());
         }
+        // Debug
+        /*
+        System.out.println(this.getClass().toString() + ":");
+        System.out.println("byte[]: " + data_.toByteArray());
+        System.out.println("sha1: " + sha1_);
+        */
     }
 }

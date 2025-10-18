@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.io.ByteArrayOutputStream;
 
@@ -36,6 +37,17 @@ public class Commit extends GitletObject<Commit.Data> {
     }
 
     // Public methods
+    public Set<Map.Entry<String, String>> entrySet() {
+        return data_.files_.entrySet();
+    }
+
+    public boolean hasFile(String filename) {
+        return data_.files_.containsKey(filename);
+    }
+
+    public String getFile(String filename) {
+        return data_.files_.get(filename);
+    }
 
 
     // Static
@@ -76,7 +88,7 @@ public class Commit extends GitletObject<Commit.Data> {
         }
     }
 
-    public static Commit createFromIndex(Index i, String msg, String parent, String altParent) {
+    public static Commit fromIndex(Index i, String msg, String parent, String altParent) {
         var entries = i.entrySet();
         Commit c = new Commit();
         c.data_.msg_ = msg;
@@ -88,7 +100,11 @@ public class Commit extends GitletObject<Commit.Data> {
         return c;
     }
 
-    public static Commit createInitial() {
+    public static Commit fromObjects(String sha1) {
+        return new Commit(sha1);
+    }
+
+    public static Commit initial() {
         Commit c = new Commit();
         c.data_ = new Commit.Data();
         c.data_.msg_ = "initial commit";

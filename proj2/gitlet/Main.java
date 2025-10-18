@@ -1,31 +1,51 @@
 package gitlet;
 
-/** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author John Doe
+/**
+ * Driver class for Gitlet, a subset of the Git version-control system.
+ *
+ * @author John Doe
  */
 public class Main {
 
-    /** Usage: java gitlet.Main ARGS, where ARGS contains
-     *  <COMMAND> <OPERAND1> <OPERAND2> ... 
+    /**
+     * Usage: java gitlet.Main ARGS, where ARGS contains
+     * <COMMAND> <OPERAND1> <OPERAND2> ...
      */
     public static void main(String[] args) {
-        if(args.length == 0) {
+        if (args.length == 0) {
             System.out.println("Please enter a command.");
             System.exit(0);
         }
         String firstArg = args[0];
-        switch(firstArg) {
+        switch (firstArg) {
             case "init":
-                if(Repository.repoExists()) {
-                    System.out.println("A Gitlet version-control system already exists in the current directory.");
+                if (Repository.repoExists()) {
+                    System.out.println("A Gitlet version-control system already exists in the " +
+                            "current directory.");
                     System.exit(0);
                 }
                 Repository.initRepo();
                 break;
             case "add":
-                // TODO: handle the `add [filename]` command
+                checkRepoExistence();
+                if (args.length != 2) {
+                    errorOperandIncorrect();
+                }
+                Repository.addFile(args[1]);
                 break;
             // TODO: FILL THE REST IN
         }
+    }
+
+    public static void checkRepoExistence() {
+        if (!Repository.repoExists()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
+    }
+
+    public static void errorOperandIncorrect() {
+        System.out.println("Incorrect operands.");
+        System.exit(0);
     }
 }

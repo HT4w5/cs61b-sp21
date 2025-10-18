@@ -41,11 +41,13 @@ public class Repository {
         index.save();
 
         // Create initial commit
-        Commit ic = Commit.createInitial();
+        Commit ic = Commit.initial();
         ic.save();
 
         // Create head file
-        Head head = Head.createEmpty(DEFAULT_BRANCH);
+        Head head = Head.createEmpty();
+        head.setBranch(DEFAULT_BRANCH);
+        head.setHash(ic.getSHA1Hash());
         head.save();
 
         // Create branches file
@@ -60,16 +62,29 @@ public class Repository {
         }
 
         Index index = Index.fromFilesystem();
+        Head head = Head.fromFilesystem();
         // Create blob
         Blob blob = Blob.fromFileName(filename);
 
-        String oldBlobHash = index.getFile(filename);
-        if (oldBlobHash != null && oldBlobHash.equals(blob.getSHA1Hash())) {
+        String indexBlobHash = index.getFile(filename);
+        if (indexBlobHash != null && indexBlobHash.equals(blob.getSHA1Hash())) {
             return;
         }
-        // TODO: compare to head commit
+        // Compare to head commit
+        Commit hc = Commit.fromObjects(head.getHash());
+        String headCommitBlobHash = hc.getFile(filename);
+        if (headCommitBlobHash != null && headCommitBlobHash.equals(blob.getSHA1Hash())) {
+            index.removeFile(filename);
+            return;
+        }
+
         blob.save();
         index.putFile(filename, blob.getSHA1Hash());
+        index.save();
+    }
+
+    public static void commit(String msg) {
+
     }
 
 }

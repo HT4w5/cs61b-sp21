@@ -28,6 +28,15 @@ public class Index {
         return i;
     }
 
+    public static Index fromCommit(Commit c) {
+        var fileSet = c.entrySet();
+        Index i = createEmpty();
+        for (var e : fileSet) {
+            i.indexMap_.put(e.getKey(), e.getValue());
+        }
+        return i;
+    }
+
     // Constructor
     private Index() {
     }

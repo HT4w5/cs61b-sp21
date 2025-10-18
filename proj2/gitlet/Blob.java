@@ -17,6 +17,7 @@ public class Blob extends GitletObject<Blob.Data> {
 
     private Blob() {
         super();
+        data_ = new Blob.Data();
     }
 
     // Static
@@ -56,13 +57,15 @@ public class Blob extends GitletObject<Blob.Data> {
         return b;
     }
 
+
+
     /**
      * Read existing blob from filesystem by SHA-1 hash
      *
      * @param sha1 SHA-1 hash hex-string of blob
      * @return Blob
      */
-    public static Blob fromSHA1Hash(String sha1) {
+    public static Blob fromObjects(String sha1) {
         return new Blob(sha1);
     }
 
