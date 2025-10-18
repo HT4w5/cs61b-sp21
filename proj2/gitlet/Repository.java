@@ -60,6 +60,14 @@ public class Repository {
         if (filename.equals(".gitlet")) {
             throw new GitletException("Can't add .gitlet directory");
         }
+        File f = join(CWD, filename);
+        if(!f.exists()) {
+            System.out.println("No such file");
+            return;
+        }
+        if(f.isDirectory()) {
+            throw new GitletException("Directories not supported");
+        }
 
         Index index = Index.fromFilesystem();
         Head head = Head.fromFilesystem();
