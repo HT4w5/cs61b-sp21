@@ -24,14 +24,14 @@ public class Main {
                             "current directory.");
                     System.exit(0);
                 }
-                Repository.initRepo();
+                Repository.init();
                 break;
             case "add":
                 checkRepoExistence();
                 if (args.length != 2) {
                     errorOperandIncorrect();
                 }
-                Repository.addFile(args[1]);
+                Repository.add(args[1]);
                 break;
             case "commit":
                 checkRepoExistence();
@@ -43,6 +43,13 @@ public class Main {
                     System.exit(0);
                 }
                 Repository.commit(args[1]);
+                break;
+            case "rm":
+                checkRepoExistence();
+                if (args.length != 2) {
+                    errorOperandIncorrect();
+                }
+                Repository.rm(args[1]);
                 break;
         }
     }

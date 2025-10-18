@@ -28,7 +28,7 @@ public class Repository {
         return GITLET_DIR.exists();
     }
 
-    public static void initRepo() {
+    public static void init() {
         if (repoExists()) {
             throw new GitletException("Repo exists");
         }
@@ -56,7 +56,7 @@ public class Repository {
         branches.save();
     }
 
-    public static void addFile(String filename) {
+    public static void add(String filename) {
         if (filename.equals(".gitlet")) {
             throw new GitletException("Can't add .gitlet directory");
         }
@@ -105,4 +105,39 @@ public class Repository {
         branches.save();
     }
 
+    public static void rm(String filename) {
+        File f = join(CWD, filename);
+        if(!f.exists()) {
+            System.out.println("No such file");
+            return;
+        }
+        if(f.isDirectory()) {
+            throw new GitletException("Directories not supported");
+        }
+
+        Index index = Index.fromFilesystem();
+        Head head = Head.fromFilesystem();
+        Branches branches = Branches.fromFilesystem();
+        Commit commit = Commit.fromObjects(head.getHash());
+
+        boolean changed = false;
+        // Unstage
+        if(index.hasFile(filename)) {
+            index.removeFile(filename);
+            changed = true;
+        }
+
+        if(commit.hasFile(filename)) {
+            changed = true;
+            if(!f.delete()) {
+                throw new GitletException("Failed to delete file from CWD");
+            }
+        }
+
+        if(!changed) {
+            System.out.println("No reason to remove the file.");
+        }
+
+        index.save();
+    }
 }
