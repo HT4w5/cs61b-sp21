@@ -31,6 +31,8 @@ public class Commit extends GitletObject<Commit.Data> {
      */
     private Commit() {
         super();
+        data_ = new Commit.Data();
+        data_.timestamp_ = Instant.now();
     }
 
     // Public methods
@@ -85,18 +87,12 @@ public class Commit extends GitletObject<Commit.Data> {
         }
     }
 
-    public static Commit createEmpty() {
-        Commit c = new Commit();
-        c.data_ = new Commit.Data();
-        c.data_.timestamp_ = Instant.now();
-        c.data_.parent_ = null;
-        c.data_.altParent_ = null;
-        return c;
-    }
-
-    public static Commit createFromIndex(Index i) {
+    public static Commit createFromIndex(Index i, String msg, String parent, String altParent) {
         var entries = i.entrySet();
-        var c = createEmpty();
+        Commit c = new Commit();
+        c.data_.msg_ = msg;
+        c.data_.parent_ = parent;
+        c.data_.altParent_ = altParent;
         entries.forEach(entry -> {
             c.data_.files_.put(entry.getKey(), entry.getValue());
         });
@@ -106,6 +102,7 @@ public class Commit extends GitletObject<Commit.Data> {
     public static Commit createInitial() {
         Commit c = new Commit();
         c.data_ = new Commit.Data();
+        c.data_.msg_ = "initial commit";
         c.data_.timestamp_ = Instant.EPOCH;
         c.data_.parent_ = null;
         c.data_.altParent_ = null;

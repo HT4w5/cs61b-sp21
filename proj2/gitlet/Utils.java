@@ -176,6 +176,7 @@ class Utils {
      * Does not require class type parameter.
      * Throws IllegalArgumentException in case of problems.
      */
+    @SuppressWarnings("unchecked")
     static <T extends Serializable> T readObject(File file) {
         try {
             ObjectInputStream in =
