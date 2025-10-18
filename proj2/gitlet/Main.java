@@ -72,6 +72,30 @@ public class Main {
                 }
                 Repository.find(args[1]);
                 break;
+            case "checkout":
+                checkRepoExistence();
+                switch (args.length) {
+                    case 2:
+                        break;
+                    case 3:
+                        if (!args[1].equals("--")) {
+                            errorOperandIncorrect();
+                        }
+                        Repository.checkoutFileFromHead(args[2]);
+                        break;
+                    case 4:
+                        if (!args[2].equals("--")) {
+                            errorOperandIncorrect();
+                        }
+                        Repository.checkoutFile(args[1], args[3]);
+                        break;
+                    default:
+                        errorOperandIncorrect();
+                }
+                break;
+            default:
+                System.out.println("No command with that name exists.");
+                System.exit(0);
         }
     }
 

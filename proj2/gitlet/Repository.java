@@ -62,7 +62,7 @@ public class Repository {
         }
         File f = join(CWD, filename);
         if (!f.exists()) {
-            System.out.println("No such file");
+            System.out.println("File does not exist.");
             return;
         }
         if (f.isDirectory()) {
@@ -116,7 +116,7 @@ public class Repository {
     public static void rm(String filename) {
         File f = join(CWD, filename);
         if (!f.exists()) {
-            System.out.println("No such file");
+            System.out.println("File does not exist.");
             return;
         }
         if (f.isDirectory()) {
@@ -198,5 +198,37 @@ public class Repository {
         if (!found) {
             System.out.println("Found no commit with that message.");
         }
+    }
+
+    public static void checkoutFile(String commit, String filename) {
+        var objects = Utils.plainFilenamesIn(OBJECTS_FOLDER);
+        if (objects == null) {
+            throw new GitletException("Missing objects");
+        }
+        String commitFull = null;
+        for (var obj : objects) {
+            if (obj.startsWith(commit)) {
+                commitFull = obj;
+            }
+        }
+        if (commitFull == null) {
+            System.out.println("No commit with that id exists.");
+            return;
+        }
+
+        Commit c = Commit.fromObjects(commit);
+        String blobHash = c.getFile(filename);
+        if (blobHash == null) {
+            System.out.println("File does not exist in that commit.");
+            return;
+        }
+
+        Blob b = Blob.fromObjects(blobHash);
+        b.restore();
+    }
+
+    public static void checkoutFileFromHead(String filename) {
+        Head head = Head.fromFilesystem();
+        checkoutFile(head.getHash(), filename);
     }
 }
