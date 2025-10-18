@@ -63,7 +63,7 @@ public class Commit extends GitletObject<Commit.Data> {
     public String toLogEntry() {
         StringBuilder sb = new StringBuilder();
         sb.append("===\n");
-        sb.append("commit: ");
+        sb.append("commit ");
         sb.append(getSHA1Hash());
         if(data_.altParent_ != null) {
             sb.append("\nMerge: ");
