@@ -61,11 +61,11 @@ public class Repository {
             throw new GitletException("Can't add .gitlet directory");
         }
         File f = join(CWD, filename);
-        if(!f.exists()) {
+        if (!f.exists()) {
             System.out.println("No such file");
             return;
         }
-        if(f.isDirectory()) {
+        if (f.isDirectory()) {
             throw new GitletException("Directories not supported");
         }
 
@@ -115,11 +115,11 @@ public class Repository {
 
     public static void rm(String filename) {
         File f = join(CWD, filename);
-        if(!f.exists()) {
+        if (!f.exists()) {
             System.out.println("No such file");
             return;
         }
-        if(f.isDirectory()) {
+        if (f.isDirectory()) {
             throw new GitletException("Directories not supported");
         }
 
@@ -130,22 +130,73 @@ public class Repository {
 
         boolean changed = false;
         // Unstage
-        if(index.hasFile(filename)) {
+        if (index.hasFile(filename)) {
             index.removeFile(filename);
             changed = true;
         }
 
-        if(commit.hasFile(filename)) {
+        if (commit.hasFile(filename)) {
             changed = true;
-            if(!f.delete()) {
+            if (!f.delete()) {
                 throw new GitletException("Failed to delete file from CWD");
             }
         }
 
-        if(!changed) {
+        if (!changed) {
             System.out.println("No reason to remove the file.");
         }
 
         index.save();
+    }
+
+    public static void log() {
+        Head head = Head.fromFilesystem();
+
+        Commit c = Commit.fromObjects(head.getHash());
+        while (true) {
+            System.out.print(c.toLogEntry());
+            if (c.getParent() == null) {
+                break;
+            }
+            c = Commit.fromObjects(c.getParent());
+        }
+    }
+
+    public static void globalLog() {
+        var objects = Utils.plainFilenamesIn(OBJECTS_FOLDER);
+        if (objects == null) {
+            throw new GitletException("Missing objects");
+        }
+        for (var obj : objects) {
+            try {
+                Commit c = Commit.fromObjects(obj);
+                System.out.print(c.toLogEntry());
+
+            } catch (IllegalArgumentException | ClassCastException e) {
+            }
+        }
+    }
+
+    public static void find(String msg) {
+        var objects = Utils.plainFilenamesIn(OBJECTS_FOLDER);
+        if (objects == null) {
+            throw new GitletException("Missing objects");
+        }
+        boolean found = false;
+        for (var obj : objects) {
+            try {
+                Commit c = Commit.fromObjects(obj);
+                if (!msg.equals(c.getMsg())) {
+                    continue;
+                }
+                System.out.println(c.getSHA1Hash());
+            } catch (IllegalArgumentException | ClassCastException e) {
+                continue;
+            }
+            found = true;
+        }
+        if (!found) {
+            System.out.println("Found no commit with that message.");
+        }
     }
 }

@@ -51,6 +51,27 @@ public class Main {
                 }
                 Repository.rm(args[1]);
                 break;
+            case "log":
+                checkRepoExistence();
+                if (args.length != 1) {
+                    errorOperandIncorrect();
+                }
+                Repository.log();
+                break;
+            case "global-log":
+                checkRepoExistence();
+                if (args.length != 1) {
+                    errorOperandIncorrect();
+                }
+                Repository.globalLog();
+                break;
+            case "find":
+                checkRepoExistence();
+                if (args.length != 2) {
+                    errorOperandIncorrect();
+                }
+                Repository.find(args[1]);
+                break;
         }
     }
 

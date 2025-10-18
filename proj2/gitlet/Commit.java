@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -53,8 +55,44 @@ public class Commit extends GitletObject<Commit.Data> {
         return data_.files_.get(filename);
     }
 
+    public String getDateString() {
+        DateTimeFormatter f = DateTimeFormatter.ofPattern(LOG_DATE_PATTERN).withZone(ZoneId.systemDefault());
+        return f.format(data_.timestamp_);
+    }
 
+    public String toLogEntry() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("===\n");
+        sb.append("commit: ");
+        sb.append(getSHA1Hash());
+        if(data_.altParent_ != null) {
+            sb.append("\nMerge: ");
+            sb.append(data_.parent_, 0, 7);
+            sb.append(" ");
+            sb.append(data_.altParent_,0,7);
+        }
+        sb.append("\nDate: ");
+        sb.append(getDateString());
+        sb.append("\n");
+        sb.append(data_.msg_);
+        sb.append("\n\n");
+        return sb.toString();
+    }
+
+    public String getParent() {
+        return data_.parent_;
+    }
+
+    public String getMsg() {
+        return data_.msg_;
+    }
+
+    public String getAltParent() {
+        return data_.altParent_;
+    }
     // Static
+    private static final String LOG_DATE_PATTERN = "EEE MMM d HH:mm:ss yyyy Z";
+
     public static class Data implements Serializable, ToBytesConvertible {
         public Instant timestamp_;
         public String msg_;
