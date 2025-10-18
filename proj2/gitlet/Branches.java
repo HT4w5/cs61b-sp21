@@ -67,6 +67,10 @@ public class Branches {
         }
     }
 
+    public void setBranchHead(String name, String head) {
+        branchMap_.put(name, new BranchInfo(head));
+    }
+
     // Private members
     private TreeMap<String, BranchInfo> branchMap_;
 }

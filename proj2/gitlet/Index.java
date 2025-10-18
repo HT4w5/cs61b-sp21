@@ -42,6 +42,23 @@ public class Index {
     }
 
     // Public methods
+    public int numFiles() {
+        return indexMap_.size();
+    }
+
+    public boolean changed(Commit c) {
+        if (indexMap_.size() != c.numFiles()) {
+            return true;
+        }
+
+        for (var e : indexMap_.entrySet()) {
+            if (!c.getFile(e.getKey()).equals(e.getValue())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void save() {
         writeObject(INDEX, indexMap_);
     }

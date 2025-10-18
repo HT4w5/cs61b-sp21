@@ -33,7 +33,17 @@ public class Main {
                 }
                 Repository.addFile(args[1]);
                 break;
-            // TODO: FILL THE REST IN
+            case "commit":
+                checkRepoExistence();
+                if (args.length != 2) {
+                    errorOperandIncorrect();
+                }
+                if (args[1].isEmpty()) {
+                    System.out.println("Please enter a commit message.");
+                    System.exit(0);
+                }
+                Repository.commit(args[1]);
+                break;
         }
     }
 

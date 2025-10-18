@@ -37,6 +37,10 @@ public class Commit extends GitletObject<Commit.Data> {
     }
 
     // Public methods
+    public int numFiles() {
+        return data_.files_.size();
+    }
+
     public Set<Map.Entry<String, String>> entrySet() {
         return data_.files_.entrySet();
     }

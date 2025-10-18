@@ -84,7 +84,25 @@ public class Repository {
     }
 
     public static void commit(String msg) {
+        Index index = Index.fromFilesystem();
+        Head head = Head.fromFilesystem();
+        Branches branches = Branches.fromFilesystem();
 
+
+        // Compare changes
+        Commit prev = Commit.fromObjects(head.getHash());
+        if (!index.changed(prev)) {
+            System.out.println("No changes added to the commit.");
+            return;
+        }
+
+        // Create commit
+        Commit nc = Commit.fromIndex(index, msg, head.getHash(), null);
+        head.setHash(nc.getSHA1Hash());
+        branches.setBranchHead(head.getBranch(), nc.getSHA1Hash());
+        nc.save();
+        head.save();
+        branches.save();
     }
 
 }
