@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static gitlet.Utils.*;
@@ -46,7 +47,7 @@ public class Branches {
         return true;
     }
 
-    public boolean getBranchHead(String name, String head) {
+    public boolean setBranchHead(String name, String head) {
         if (!branchMap_.containsKey(name)) {
             return false;
         }
@@ -58,6 +59,13 @@ public class Branches {
         return branchMap_.containsKey(name);
     }
 
+    public boolean rmBranch(String name) {
+        if (branchMap_.remove(name) == null) {
+            return false;
+        }
+        return true;
+    }
+
     public String getBranchHead(String name) {
         var br = branchMap_.get(name);
         if (br == null) {
@@ -67,8 +75,8 @@ public class Branches {
         }
     }
 
-    public void setBranchHead(String name, String head) {
-        branchMap_.put(name, new BranchInfo(head));
+    public Set<String> branchSet() {
+        return branchMap_.keySet();
     }
 
     // Private members

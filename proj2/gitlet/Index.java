@@ -1,7 +1,6 @@
 package gitlet;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.TreeMap;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +80,10 @@ public class Index {
 
     public Set<Map.Entry<String, String>> entrySet() {
         return indexMap_.entrySet();
+    }
+
+    public Set<String> filenameSet() {
+        return indexMap_.keySet();
     }
 
     // Private members

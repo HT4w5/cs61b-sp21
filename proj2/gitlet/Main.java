@@ -93,6 +93,33 @@ public class Main {
                         errorOperandIncorrect();
                 }
                 break;
+            case "status":
+                checkRepoExistence();
+                if (args.length != 1) {
+                    errorOperandIncorrect();
+                }
+                Repository.status();
+                break;
+            case "branch":
+                checkRepoExistence();
+                if (args.length != 2) {
+                    errorOperandIncorrect();
+                }
+                if (args[1].isEmpty()) {
+                    errorOperandIncorrect();
+                }
+                Repository.branch(args[1]);
+                break;
+            case "rm-branch":
+                checkRepoExistence();
+                if (args.length != 2) {
+                    errorOperandIncorrect();
+                }
+                if (args[1].isEmpty()) {
+                    errorOperandIncorrect();
+                }
+                Repository.rmBranch(args[1]);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);

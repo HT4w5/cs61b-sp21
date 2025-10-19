@@ -47,6 +47,10 @@ public class Commit extends GitletObject<Commit.Data> {
         return data_.files_.entrySet();
     }
 
+    public Set<String> filenameSet() {
+        return data_.files_.keySet();
+    }
+
     public boolean hasFile(String filename) {
         return data_.files_.containsKey(filename);
     }
@@ -56,7 +60,8 @@ public class Commit extends GitletObject<Commit.Data> {
     }
 
     public String getDateString() {
-        DateTimeFormatter f = DateTimeFormatter.ofPattern(LOG_DATE_PATTERN).withZone(ZoneId.systemDefault());
+        DateTimeFormatter f =
+                DateTimeFormatter.ofPattern(LOG_DATE_PATTERN).withZone(ZoneId.systemDefault());
         return f.format(data_.timestamp_);
     }
 
@@ -65,11 +70,11 @@ public class Commit extends GitletObject<Commit.Data> {
         sb.append("===\n");
         sb.append("commit ");
         sb.append(getSHA1Hash());
-        if(data_.altParent_ != null) {
+        if (data_.altParent_ != null) {
             sb.append("\nMerge: ");
             sb.append(data_.parent_, 0, 7);
             sb.append(" ");
-            sb.append(data_.altParent_,0,7);
+            sb.append(data_.altParent_, 0, 7);
         }
         sb.append("\nDate: ");
         sb.append(getDateString());
@@ -90,6 +95,7 @@ public class Commit extends GitletObject<Commit.Data> {
     public String getAltParent() {
         return data_.altParent_;
     }
+
     // Static
     private static final String LOG_DATE_PATTERN = "EEE MMM d HH:mm:ss yyyy Z";
 

@@ -38,7 +38,9 @@ public abstract class GitletObject<Data extends ToBytesConvertible & Serializabl
         computeSha1();
         File f = join(OBJECTS_FOLDER, sha1_);
         if (f.exists()) {
-            throw new GitletException("object present in filesystem");
+            // throw new GitletException("object present in filesystem");
+            // Fail silently
+            return;
         }
         writeObject(f, data_);
     }

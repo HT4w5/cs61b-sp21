@@ -1,6 +1,10 @@
 package gitlet;
 
+import com.sun.source.tree.Tree;
+
 import java.io.File;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static gitlet.Utils.*;
 
@@ -230,5 +234,113 @@ public class Repository {
     public static void checkoutFileFromHead(String filename) {
         Head head = Head.fromFilesystem();
         checkoutFile(head.getHash(), filename);
+    }
+
+    public static void status() {
+        Branches branches = Branches.fromFilesystem();
+        Head head = Head.fromFilesystem();
+        Index index = Index.fromFilesystem();
+        Commit latest = Commit.fromObjects(head.getHash());
+
+        // Branches
+        System.out.println("=== Branches ===");
+
+        var branchSet = branches.branchSet();
+        var currentBranch = head.getBranch();
+        for (var b : branchSet) {
+            if (b.equals(currentBranch)) {
+                System.out.print("*");
+            }
+            System.out.println(b);
+        }
+
+        // Staged and removed files
+        var indexFileSet = index.filenameSet();
+        var latestCommitFileSet = latest.filenameSet();
+
+        Set<String> staged = new TreeSet<String>(indexFileSet);
+        staged.removeAll(latestCommitFileSet);
+
+        Set<String> removed = new TreeSet<String>(latestCommitFileSet);
+        removed.removeAll(indexFileSet);
+
+        System.out.println();
+        System.out.println("=== Staged Files ===");
+        for (var f : staged) {
+            System.out.println(f);
+        }
+
+        System.out.println();
+        System.out.println("=== Removed Files ===");
+        for (var f : removed) {
+            System.out.println(f);
+        }
+
+        // Modifications
+        var indexSet = index.entrySet();
+        Set<String> output = new TreeSet<>();
+        for (var e : indexSet) {
+            File f = Utils.join(CWD, e.getKey());
+            if (!f.exists()) {
+                output.add(e.getKey() + " (deleted)");
+                continue;
+            }
+            if (f.isDirectory()) {
+                throw new GitletException("Directories not supported");
+            }
+            Blob b = Blob.fromFileName(e.getKey());
+            if (!e.getValue().equals(b.getSHA1Hash())) {
+                output.add(e.getKey() + " (modified)");
+            }
+        }
+
+        System.out.println();
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        for (var line : output) {
+            System.out.println(line);
+        }
+
+        // Untracked
+        var currentFilesList = Utils.plainFilenamesIn(CWD);
+        if (currentFilesList == null) {
+            throw new GitletException("Missing files");
+        }
+        Set<String> untracked = new TreeSet<>(currentFilesList);
+        untracked.removeAll(indexFileSet);
+
+        System.out.println();
+        System.out.println("=== Untracked Files ===");
+        for (var line : untracked) {
+            System.out.println(line);
+        }
+
+        System.out.println();
+    }
+
+    public static void branch(String name) {
+        Branches branches = Branches.fromFilesystem();
+        Head head = Head.fromFilesystem();
+
+        if(!branches.createBranch(name, head.getHash())) {
+            System.out.println("A branch with that name already exists.");
+            return;
+        }
+        branches.save();
+    }
+
+    public static void rmBranch(String name) {
+        Head head = Head.fromFilesystem();
+        if(head.getBranch().equals(name)) {
+            System.out.println("Cannot remove the current branch.");
+            return;
+        }
+
+        Branches branches = Branches.fromFilesystem();
+        if(!branches.rmBranch(name)) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        }
+
+        branches.save();
     }
 }
