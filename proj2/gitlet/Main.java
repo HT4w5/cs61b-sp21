@@ -1,5 +1,7 @@
 package gitlet;
 
+import java.util.ResourceBundle;
+
 /**
  * Driver class for Gitlet, a subset of the Git version-control system.
  *
@@ -76,6 +78,10 @@ public class Main {
                 checkRepoExistence();
                 switch (args.length) {
                     case 2:
+                        if (args[1].isEmpty()) {
+                            errorOperandIncorrect();
+                        }
+                        Repository.checkoutBranch(args[1]);
                         break;
                     case 3:
                         if (!args[1].equals("--")) {

@@ -236,6 +236,58 @@ public class Repository {
         checkoutFile(head.getHash(), filename);
     }
 
+    public static void checkoutBranch(String name) {
+        // Check if is current branch
+        Head head = Head.fromFilesystem();
+        if (name.equals(head.getBranch())) {
+            System.out.println("No need to checkout the current branch.");
+            return;
+        }
+
+        // Check branch availability
+        Branches branches = Branches.fromFilesystem();
+        String newBranchHead = branches.getBranchHead(name);
+        if (newBranchHead == null) {
+            System.out.println("No such branch exists.");
+            return;
+        }
+
+        // Check for untracked files
+        Index index = Index.fromFilesystem();
+        var indexFileSet = index.filenameSet();
+        var currentFilesList = Utils.plainFilenamesIn(CWD);
+        if (currentFilesList == null) {
+            throw new GitletException("No a directory");
+        }
+        Set<String> untracked = new TreeSet<>(currentFilesList);
+        untracked.removeAll(indexFileSet);
+
+        if (!untracked.isEmpty()) {
+            System.out.println("There is an untracked file in the way; delete it, or add and " +
+                    "commit it first.");
+            return;
+        }
+
+        // Restore CWD
+        Commit newHead = Commit.fromObjects(newBranchHead);
+        for (var n : currentFilesList) {
+            File f = join(CWD, n);
+            f.delete();
+        }
+        for (var e : newHead.entrySet()) {
+            Blob b = Blob.fromObjects(e.getValue());
+            b.restore();
+        }
+
+        // Modify index
+        Index newIndex = Index.fromCommit(newHead);
+        newIndex.save();
+
+        // Modify head
+        head.set(name, newBranchHead);
+        head.save();
+    }
+
     public static void status() {
         Branches branches = Branches.fromFilesystem();
         Head head = Head.fromFilesystem();
@@ -303,7 +355,7 @@ public class Repository {
         // Untracked
         var currentFilesList = Utils.plainFilenamesIn(CWD);
         if (currentFilesList == null) {
-            throw new GitletException("Missing files");
+            throw new GitletException("No a directory");
         }
         Set<String> untracked = new TreeSet<>(currentFilesList);
         untracked.removeAll(indexFileSet);
@@ -321,7 +373,7 @@ public class Repository {
         Branches branches = Branches.fromFilesystem();
         Head head = Head.fromFilesystem();
 
-        if(!branches.createBranch(name, head.getHash())) {
+        if (!branches.createBranch(name, head.getHash())) {
             System.out.println("A branch with that name already exists.");
             return;
         }
@@ -330,13 +382,13 @@ public class Repository {
 
     public static void rmBranch(String name) {
         Head head = Head.fromFilesystem();
-        if(head.getBranch().equals(name)) {
+        if (head.getBranch().equals(name)) {
             System.out.println("Cannot remove the current branch.");
             return;
         }
 
         Branches branches = Branches.fromFilesystem();
-        if(!branches.rmBranch(name)) {
+        if (!branches.rmBranch(name)) {
             System.out.println("A branch with that name does not exist.");
             return;
         }
