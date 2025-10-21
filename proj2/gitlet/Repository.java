@@ -249,25 +249,7 @@ public class Repository {
             return;
         }
 
-        var currentFilesList = Utils.plainFilenamesIn(CWD);
-        if (currentFilesList == null) {
-            throw new GitletException("CWD should be directory");
-        }
-
-        // Restore CWD
-        Commit newHead = Commit.fromObjects(newBranchHead);
-        for (var n : currentFilesList) {
-            File f = join(CWD, n);
-            f.delete();
-        }
-        for (var e : newHead.entrySet()) {
-            Blob b = Blob.fromObjects(e.getValue());
-            b.restore();
-        }
-
-        // Modify index
-        Index newIndex = Index.fromCommit(newHead);
-        newIndex.save();
+        restoreCommit(newBranchHead);
 
         // Modify head
         head.set(name, newBranchHead);
@@ -384,7 +366,17 @@ public class Repository {
 
     public static void reset(String commit) {
         Index index = Index.fromFilesystem();
+        if (hasUntracked(index)) {
+            System.out.println("There is an untracked file in the way; delete it, or add and " +
+                    "commit it first.");
+            return;
+        }
 
+        var commitFull = getFullObjectHash(commit);
+        if (commitFull == null) {
+            System.out.println("No commit with that id exists.");
+            return;
+        }
     }
 
     private static boolean hasUntracked(Index index) {
@@ -412,5 +404,25 @@ public class Repository {
             }
         }
         return objectHash;
+    }
+
+    private static void restoreCommit(String commit) {
+        // Restore CWD
+        var currentFilesList = Utils.plainFilenamesIn(CWD);
+        if (currentFilesList == null) {
+            throw new GitletException("CWD should be directory");
+        }
+        Commit c = Commit.fromObjects(commit);
+        for (var n : currentFilesList) {
+            File f = join(CWD, n);
+            f.delete();
+        }
+        for (var e : c.entrySet()) {
+            Blob b = Blob.fromObjects(e.getValue());
+            b.restore();
+        }
+        // Modify index
+        Index newIndex = Index.fromCommit(c);
+        newIndex.save();
     }
 }
