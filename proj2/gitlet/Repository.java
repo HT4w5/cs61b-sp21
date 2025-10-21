@@ -252,20 +252,17 @@ public class Repository {
             return;
         }
 
-        // Check for untracked files
         Index index = Index.fromFilesystem();
-        var indexFileSet = index.filenameSet();
-        var currentFilesList = Utils.plainFilenamesIn(CWD);
-        if (currentFilesList == null) {
-            throw new GitletException("No a directory");
-        }
-        Set<String> untracked = new TreeSet<>(currentFilesList);
-        untracked.removeAll(indexFileSet);
 
-        if (!untracked.isEmpty()) {
+        if (hasUntracked(index)) {
             System.out.println("There is an untracked file in the way; delete it, or add and " +
                     "commit it first.");
             return;
+        }
+
+        var currentFilesList = Utils.plainFilenamesIn(CWD);
+        if (currentFilesList == null) {
+            throw new GitletException("CWD should be directory");
         }
 
         // Restore CWD
@@ -394,5 +391,22 @@ public class Repository {
         }
 
         branches.save();
+    }
+
+    public static void reset(String commit) {
+
+    }
+
+    private static boolean hasUntracked(Index index) {
+        // Check for untracked files
+        var indexFileSet = index.filenameSet();
+        var currentFilesList = Utils.plainFilenamesIn(CWD);
+        if (currentFilesList == null) {
+            throw new GitletException("No a directory");
+        }
+        Set<String> untracked = new TreeSet<>(currentFilesList);
+        untracked.removeAll(indexFileSet);
+
+        return !untracked.isEmpty();
     }
 }
