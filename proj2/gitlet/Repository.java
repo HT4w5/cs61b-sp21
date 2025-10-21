@@ -1,7 +1,5 @@
 package gitlet;
 
-import com.sun.source.tree.Tree;
-
 import java.io.File;
 import java.util.Set;
 import java.util.TreeSet;
@@ -205,22 +203,13 @@ public class Repository {
     }
 
     public static void checkoutFile(String commit, String filename) {
-        var objects = Utils.plainFilenamesIn(OBJECTS_FOLDER);
-        if (objects == null) {
-            throw new GitletException("Missing objects");
-        }
-        String commitFull = null;
-        for (var obj : objects) {
-            if (obj.startsWith(commit)) {
-                commitFull = obj;
-            }
-        }
+        var commitFull = getFullObjectHash(commit);
         if (commitFull == null) {
             System.out.println("No commit with that id exists.");
             return;
         }
 
-        Commit c = Commit.fromObjects(commit);
+        Commit c = Commit.fromObjects(commitFull);
         String blobHash = c.getFile(filename);
         if (blobHash == null) {
             System.out.println("File does not exist in that commit.");
@@ -394,6 +383,7 @@ public class Repository {
     }
 
     public static void reset(String commit) {
+        Index index = Index.fromFilesystem();
 
     }
 
@@ -408,5 +398,19 @@ public class Repository {
         untracked.removeAll(indexFileSet);
 
         return !untracked.isEmpty();
+    }
+
+    private static String getFullObjectHash(String hashPrefix) {
+        var objects = Utils.plainFilenamesIn(OBJECTS_FOLDER);
+        if (objects == null) {
+            throw new GitletException("Missing objects");
+        }
+        String objectHash = null;
+        for (var obj : objects) {
+            if (obj.startsWith(hashPrefix)) {
+                objectHash = obj;
+            }
+        }
+        return objectHash;
     }
 }
