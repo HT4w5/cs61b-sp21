@@ -1,0 +1,19 @@
+# rm file success
+I base.inc
+> rm a.txt
+<<<
+* a.txt
+> commit "rm a.txt"
+<<<
++ b.txt notwug.txt
+> add b.txt
+<<<
+> rm b.txt
+<<<
+E b.txt
+> commit "should fail"
+No changes added to the commit.
+<<<
+> rm b.txt
+No reason to remove the file.
+<<<
