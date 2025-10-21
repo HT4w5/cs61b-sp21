@@ -377,6 +377,12 @@ public class Repository {
             System.out.println("No commit with that id exists.");
             return;
         }
+
+        restoreCommit(commitFull);
+
+        Head head = Head.fromFilesystem();
+        head.setHash(commitFull);
+        head.save();
     }
 
     private static boolean hasUntracked(Index index) {
