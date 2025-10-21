@@ -2,6 +2,7 @@
 <<<
 # create another branch b
 > branch b
+<<<
 # master branch has a.txt
 + a.txt wug.txt
 > add a.txt
@@ -16,5 +17,5 @@
 <<<
 > commit "add b.txt"
 <<<
-> branch master
+> checkout master
 <<<
