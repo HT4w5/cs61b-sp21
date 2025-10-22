@@ -1,7 +1,5 @@
 package gitlet;
 
-import java.util.ResourceBundle;
-
 /**
  * Driver class for Gitlet, a subset of the Git version-control system.
  *
@@ -125,6 +123,16 @@ public class Main {
                     errorOperandIncorrect();
                 }
                 Repository.rmBranch(args[1]);
+                break;
+            case "reset":
+                checkRepoExistence();
+                if (args.length != 2) {
+                    errorOperandIncorrect();
+                }
+                if (args[1].isEmpty()) {
+                    errorOperandIncorrect();
+                }
+                Repository.reset(args[1]);
                 break;
             default:
                 System.out.println("No command with that name exists.");

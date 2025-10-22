@@ -1,0 +1,11 @@
+I definitions.inc
+I base.inc
+> reset 53d0
+<<<
+* a.txt
+> log
+===
+${COMMIT_HEAD}
+initial commit
+
+<<<*
