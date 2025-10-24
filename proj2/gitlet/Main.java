@@ -134,6 +134,16 @@ public class Main {
                 }
                 Repository.reset(args[1]);
                 break;
+            case "merge":
+                checkRepoExistence();
+                if (args.length != 2) {
+                    errorOperandIncorrect();
+                }
+                if (args[1].isEmpty()) {
+                    errorOperandIncorrect();
+                }
+                Repository.merge(args[1]);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);
