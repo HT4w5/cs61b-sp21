@@ -126,7 +126,6 @@ public class Repository {
 
         Index index = Index.fromFilesystem();
         Head head = Head.fromFilesystem();
-        Branches branches = Branches.fromFilesystem();
         Commit commit = Commit.fromObjects(head.getHash());
 
         boolean changed = false;
@@ -169,12 +168,8 @@ public class Repository {
             throw new GitletException("Missing objects");
         }
         for (var obj : objects) {
-            try {
-                Commit c = Commit.fromObjects(obj);
-                System.out.print(c.toLogEntry());
-
-            } catch (IllegalArgumentException | ClassCastException e) {
-            }
+            Commit c = Commit.fromObjects(obj);
+            System.out.print(c.toLogEntry());
         }
     }
 
@@ -491,7 +486,7 @@ public class Repository {
         commonFiles.retainAll(currentCommit.filenameSet());
 
         filesOnlyInCurrent.removeAll(commonFiles);
-        filesOnlyInCurrent.removeAll(commonFiles);
+        filesOnlyInGiven.removeAll(commonFiles);
 
         for (String f : filesOnlyInCurrent) {
             String fHash = currentCommit.getFile(f);
@@ -551,6 +546,9 @@ public class Repository {
         head.save();
         branches.setBranchHead(head.getBranch(), nc.getSHA1Hash());
 
+        // Restore files
+        restoreCommit(nc.getSHA1Hash());
+
         if (conflict) {
             System.out.println("Encountered a merge conflict.");
         }
@@ -592,7 +590,9 @@ public class Repository {
         Commit c = Commit.fromObjects(commit);
         for (var n : currentFilesList) {
             File f = join(CWD, n);
-            f.delete();
+            if (!f.delete()) {
+                System.out.println("warning: file deletion failed: " + n);
+            }
         }
         for (var e : c.entrySet()) {
             Blob b = Blob.fromObjects(e.getValue());
