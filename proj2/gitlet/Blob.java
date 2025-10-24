@@ -1,10 +1,8 @@
 package gitlet;
 
-import java.io.FileNotFoundException;
-import java.io.Serializable;
-import java.io.File;
+import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.io.ByteArrayOutputStream;
 
 import static gitlet.Utils.*;
 
@@ -57,6 +55,27 @@ public class Blob extends GitletObject<Blob.Data> {
         return b;
     }
 
+    public static Blob fromMerge(String filename, Blob first, Blob second) {
+        Blob b = new Blob();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            baos.write("<<<<<<< HEAD\n".getBytes(StandardCharsets.UTF_8));
+            if (first != null) {
+                baos.write(first.getContent());
+            }
+            baos.write("=======\n".getBytes(StandardCharsets.UTF_8));
+            if (second != null) {
+                baos.write(second.getContent());
+            }
+            baos.write(">>>>>>>".getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // Save data
+        b.data_.content_ = baos.toByteArray();
+        b.data_.filename_ = filename;
+        return b;
+    }
 
 
     /**
@@ -78,6 +97,10 @@ public class Blob extends GitletObject<Blob.Data> {
     public void restore() {
         File f = join(Repository.CWD, data_.filename_);
         writeContents(f, (Object) data_.content_);
+    }
+
+    public byte[] getContent() {
+        return data_.content_;
     }
 
     public String getFilename() {

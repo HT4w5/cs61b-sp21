@@ -1,8 +1,7 @@
 package gitlet;
 
 import java.io.File;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -278,10 +277,10 @@ public class Repository {
         var indexFileSet = index.filenameSet();
         var latestCommitFileSet = latest.filenameSet();
 
-        Set<String> staged = new TreeSet<String>(indexFileSet);
+        Set<String> staged = new TreeSet<>(indexFileSet);
         staged.removeAll(latestCommitFileSet);
 
-        Set<String> removed = new TreeSet<String>(latestCommitFileSet);
+        Set<String> removed = new TreeSet<>(latestCommitFileSet);
         removed.removeAll(indexFileSet);
 
         System.out.println();
@@ -383,6 +382,178 @@ public class Repository {
         Head head = Head.fromFilesystem();
         head.setHash(commitFull);
         head.save();
+
+        Branches branches = Branches.fromFilesystem();
+        branches.setBranchHead(head.getBranch(), commitFull);
+        branches.save();
+    }
+
+    public static void merge(String givenBranch) {
+        Head head = Head.fromFilesystem();
+        if (givenBranch.equals(head.getBranch())) {
+            System.out.println("Cannot merge a branch with itself.");
+            return;
+        }
+
+        Branches branches = Branches.fromFilesystem();
+        String givenBranchHead = branches.getBranchHead(givenBranch);
+        if (givenBranchHead == null) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        }
+
+        Index currentIndex = Index.fromFilesystem();
+        if (hasUntracked(currentIndex)) {
+            System.out.println("There is an untracked file in the way; delete it, or add and " +
+                    "commit it first.");
+            return;
+        }
+
+        String currentBranchHead = head.getHash();
+        Commit currentCommit = Commit.fromObjects(currentBranchHead);
+        if (currentIndex.changed(currentCommit)) {
+            System.out.println("You have uncommitted changes.");
+            return;
+        }
+
+        // Look for split point
+        HashSet<String> currentAncestors = new HashSet<>();
+        Queue<String> fringe = new LinkedList<>();
+
+        // Search for all ancestors of current branch head
+        fringe.add(currentBranchHead);
+        while (!fringe.isEmpty()) {
+            String hash = fringe.remove();
+            Commit c = Commit.fromObjects(hash);
+            currentAncestors.add(hash);
+            String parent = c.getParent();
+            String altParent = c.getAltParent();
+            if (parent != null) {
+                fringe.add(parent);
+            }
+            if (altParent != null) {
+                fringe.add(altParent);
+            }
+        }
+
+        // BFS for latest common ancestor
+        String latestCommonAncestor = null;
+        fringe = new LinkedList<>();
+        fringe.add(givenBranchHead);
+        while (!fringe.isEmpty()) {
+            String hash = fringe.remove();
+            if (currentAncestors.contains(hash)) {
+                latestCommonAncestor = hash;
+                break;
+            }
+            Commit c = Commit.fromObjects(hash);
+            String parent = c.getParent();
+            String altParent = c.getAltParent();
+            if (parent != null) {
+                fringe.add(parent);
+            }
+            if (altParent != null) {
+                fringe.add(altParent);
+            }
+        }
+
+        if (latestCommonAncestor == null) {
+            throw new GitletException("No common ancestors");
+        }
+
+        // Fast-forward
+        if (latestCommonAncestor.equals(currentBranchHead)) {
+            restoreCommit(givenBranchHead);
+            branches.setBranchHead(head.getBranch(), givenBranchHead);
+            branches.save();
+            head.setHash(givenBranchHead);
+            head.save();
+            System.out.println("Current branch fast-forwarded.");
+            return;
+        }
+
+        // Nothing to do
+        if (latestCommonAncestor.equals(givenBranchHead)) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            return;
+        }
+
+        // Three-way merge
+        boolean conflict = false;
+        Commit givenCommit = Commit.fromObjects(givenBranchHead);
+        Commit splitPointCommit = Commit.fromObjects(latestCommonAncestor);
+
+        Index newIndex = Index.createEmpty();
+
+        Set<String> commonFiles = new HashSet<>(givenCommit.filenameSet());
+        Set<String> filesOnlyInGiven = new HashSet<>(commonFiles);
+        Set<String> filesOnlyInCurrent = new HashSet<>(currentCommit.filenameSet());
+        commonFiles.retainAll(currentCommit.filenameSet());
+
+        filesOnlyInCurrent.removeAll(commonFiles);
+        filesOnlyInCurrent.removeAll(commonFiles);
+
+        for (String f : filesOnlyInCurrent) {
+            String fHash = currentCommit.getFile(f);
+            String splitHash = splitPointCommit.getFile(f);
+            if (splitHash == null) {
+                newIndex.putFile(f, fHash);
+            } else if (!fHash.equals(splitHash)) {
+                Blob orig = Blob.fromObjects(fHash);
+                Blob merged = Blob.fromMerge(f, orig, null);
+                merged.save();
+                newIndex.putFile(f, merged.getSHA1Hash());
+                conflict = true;
+            }
+        }
+        for (String f : filesOnlyInGiven) {
+            String fHash = currentCommit.getFile(f);
+            String splitHash = splitPointCommit.getFile(f);
+            if (splitHash == null) {
+                newIndex.putFile(f, fHash);
+            } else if (!fHash.equals(splitHash)) {
+                Blob orig = Blob.fromObjects(fHash);
+                Blob merged = Blob.fromMerge(f, null, orig);
+                merged.save();
+                newIndex.putFile(f, merged.getSHA1Hash());
+                conflict = true;
+            }
+        }
+
+        for (String f : commonFiles) {
+            String currentHash = currentCommit.getFile(f);
+            String givenHash = givenCommit.getFile(f);
+            if (currentHash.equals(givenHash)) {
+                newIndex.putFile(f, currentHash);
+            } else {
+                String splitHash = splitPointCommit.getFile(f);
+                if (splitHash.equals(currentHash)) {
+                    newIndex.putFile(f, givenHash);
+                } else if (splitHash.equals(givenHash)) {
+                    newIndex.putFile(f, currentHash);
+                } else {
+                    // conflict
+                    Blob currentBlob = Blob.fromObjects(currentHash);
+                    Blob givenBlob = Blob.fromObjects(givenHash);
+                    Blob merged = Blob.fromMerge(f, currentBlob, givenBlob);
+                    merged.save();
+                    newIndex.putFile(f, merged.getSHA1Hash());
+                    conflict = true;
+                }
+            }
+        }
+
+        // Generate commit
+        String msg = "Merged " + givenBranch + " into " + head.getBranch() + ".";
+        Commit nc = Commit.fromIndex(newIndex, msg, currentBranchHead, givenBranchHead);
+        nc.save();
+        head.setHash(nc.getSHA1Hash());
+        head.save();
+        branches.setBranchHead(head.getBranch(), nc.getSHA1Hash());
+
+        if(conflict) {
+            System.out.println("Encountered a merge conflict.");
+        }
     }
 
     private static boolean hasUntracked(Index index) {
