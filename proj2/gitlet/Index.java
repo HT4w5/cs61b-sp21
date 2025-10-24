@@ -51,7 +51,11 @@ public class Index {
         }
 
         for (var e : indexMap_.entrySet()) {
-            if (!c.getFile(e.getKey()).equals(e.getValue())) {
+            String file = c.getFile(e.getKey());
+            if(file == null) {
+                return true;
+            }
+            if (!file.equals(e.getValue())) {
                 return true;
             }
         }
