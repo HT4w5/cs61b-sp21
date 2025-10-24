@@ -507,7 +507,7 @@ public class Repository {
             }
         }
         for (String f : filesOnlyInGiven) {
-            String fHash = currentCommit.getFile(f);
+            String fHash = givenCommit.getFile(f);
             String splitHash = splitPointCommit.getFile(f);
             if (splitHash == null) {
                 newIndex.putFile(f, fHash);
@@ -551,7 +551,7 @@ public class Repository {
         head.save();
         branches.setBranchHead(head.getBranch(), nc.getSHA1Hash());
 
-        if(conflict) {
+        if (conflict) {
             System.out.println("Encountered a merge conflict.");
         }
     }
