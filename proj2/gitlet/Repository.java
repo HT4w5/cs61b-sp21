@@ -150,8 +150,11 @@ public class Repository {
             throw new GitletException("Missing objects");
         }
         for (var obj : objects) {
-            Commit c = Commit.fromObjects(obj);
-            System.out.print(c.toLogEntry());
+            try {
+                Commit c = Commit.fromObjects(obj);
+                System.out.print(c.toLogEntry());
+            } catch (ClassCastException ignored) {
+            }
         }
     }
 
