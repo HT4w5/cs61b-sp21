@@ -75,18 +75,6 @@ public class Repository {
         // Create blob
         Blob blob = Blob.fromFileName(filename);
 
-        String indexBlobHash = index.getFile(filename);
-        if (indexBlobHash != null && indexBlobHash.equals(blob.getSHA1Hash())) {
-            return;
-        }
-        // Compare to head commit
-        Commit hc = Commit.fromObjects(head.getHash());
-        String headCommitBlobHash = hc.getFile(filename);
-        if (headCommitBlobHash != null && headCommitBlobHash.equals(blob.getSHA1Hash())) {
-            index.removeFile(filename);
-            return;
-        }
-
         blob.save();
         index.putFile(filename, blob.getSHA1Hash());
         index.save();
@@ -116,10 +104,6 @@ public class Repository {
 
     public static void rm(String filename) {
         File f = join(CWD, filename);
-        if (!f.exists()) {
-            System.out.println("File does not exist.");
-            return;
-        }
         if (f.isDirectory()) {
             throw new GitletException("Directories not supported");
         }
@@ -137,9 +121,7 @@ public class Repository {
 
         if (commit.hasFile(filename)) {
             changed = true;
-            if (!f.delete()) {
-                throw new GitletException("Failed to delete file from CWD");
-            }
+            f.delete();
         }
 
         if (!changed) {
