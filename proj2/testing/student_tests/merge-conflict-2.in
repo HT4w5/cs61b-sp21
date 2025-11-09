@@ -1,0 +1,33 @@
+I merge-base.inc
+I definitions.inc
+> checkout b
+<<<
++ orig.txt wug2.txt
+> add orig.txt
+<<<
+> commit "Modify orig.txt (b)"
+<<<
+> checkout a
+<<<
++ orig.txt notwug.txt
+> add orig.txt
+<<<
+> commit "Modify orig.txt (a)"
+<<<
+> merge b
+Encountered a merge conflict.
+<<<
+E a.txt
+E b.txt
+E orig.txt
+= orig.txt conflict2.txt
+> log
+===
+${COMMIT_HEAD}
+Merged b into a.
+
+===
+${COMMIT_HEAD}
+Modify orig.txt \(a\)
+${ARBLINES}
+<<<*

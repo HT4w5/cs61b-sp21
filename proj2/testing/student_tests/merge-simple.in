@@ -1,0 +1,15 @@
+I merge-base.inc
+I definitions.inc
+> checkout a
+<<<
+> merge b
+<<<
+E a.txt
+E b.txt
+E orig.txt
+> log
+===
+${COMMIT_HEAD}
+Merged b into a.
+${ARBLINES}
+<<<*

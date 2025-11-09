@@ -1,0 +1,16 @@
+I merge-base.inc
+I definitions.inc
+> checkout split
+<<<
+> merge a
+Current branch fast-forwarded.
+<<<
+E a.txt
+* b.txt
+E orig.txt
+> log
+===
+${COMMIT_HEAD}
+add a.txt
+${ARBLINES}
+<<<*

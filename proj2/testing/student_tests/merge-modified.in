@@ -1,0 +1,23 @@
+I merge-base.inc
+I definitions.inc
+> checkout b
+<<<
++ orig.txt notwug.txt
+> add orig.txt
+<<<
+> commit "Modify orig.txt"
+<<<
+> checkout a
+<<<
+> merge b
+<<<
+E a.txt
+E b.txt
+E orig.txt
+= orig.txt notwug.txt
+> log
+===
+${COMMIT_HEAD}
+Merged b into a.
+${ARBLINES}
+<<<*
